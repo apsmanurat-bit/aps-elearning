@@ -27,15 +27,15 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 4. LINK DATABASE (SUDAH DIPERBAIKI SESUAI LINK BAPAK)
-# Perhatikan huruf kecil di ID ini, Pak
-URL_DATABASE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg/export?format=csv"
+# 4. LINK DATABASE (DISESUAIKAN DENGAN GAMBAR BAPAK)
+# Mengarahkan langsung ke sheet "Form Responses 1"
+SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
+URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form%20Responses%201"
 
 # --- LOGIKA MENU ---
 
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
-    st.markdown("<h4 style='text-align: center;'>English Dept. Politeknik MBP</h4>", unsafe_allow_html=True)
     st.divider()
     
     st.subheader("🔐 Access Your Class")
@@ -46,35 +46,36 @@ if menu == "Akses Kelas & Absensi":
             # Membaca data
             df = pd.read_csv(URL_DATABASE)
             
-            # Membersihkan nama kolom
+            # Membersihkan nama kolom (menghilangkan spasi dan ke huruf besar)
             df.columns = [c.strip().upper() for c in df.columns]
             
-            # Cari NIM
+            # Cari NIM mahasiswa
             target_nim = str(nim_input).strip()
-            # Membersihkan data NIM di tabel dari spasi
+            # Memastikan kolom NIM dibaca sebagai teks
             df['NIM'] = df['NIM'].astype(str).str.strip()
             
             student_data = df[df['NIM'] == target_nim]
             
             if not student_data.empty:
-                status = str(student_data.iloc[0]['STATUS']).strip().upper()
-                nama = student_data.iloc[0]['NAMA']
-                if status == "APPROVED":
-                    st.success(f"Welcome, {nama}! Your status is APPROVED.")
+                # Mengambil data dari kolom NAMA dan STATUS sesuai gambar Bapak
+                nama_mhs = student_data.iloc[0]['NAMA']
+                status_mhs = str(student_data.iloc[0]['STATUS']).strip().upper()
+                
+                if status_mhs == "APPROVED":
+                    st.success(f"Welcome, {nama_mhs}! Your status is APPROVED.")
                     st.balloons()
                 else:
-                    st.warning(f"Hello {nama}, your status is: {status}.")
+                    st.warning(f"Hello {nama_mhs}, your status is: {status_mhs}.")
             else:
-                st.error("NIM tidak ditemukan di database.")
+                st.error("NIM tidak ditemukan. Pastikan Anda sudah mengisi form pendaftaran.")
         except Exception as e:
-            st.error("Gagal membaca data.")
-            st.info("Pastikan kolom di Excel Bapak berjudul: NAMA, NIM, dan STATUS.")
+            st.error("Gagal terhubung ke database. Silakan lapor ke Pak Anggiat.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
-    st.write("Silakan masuk ke portal materi:")
+    st.write("Silakan akses Google Classroom Anda:")
     st.link_button("🚀 Buka Google Classroom", "https://classroom.google.com/") 
 
 elif menu == "Bantuan":
     st.title("❓ Bantuan")
-    st.write("Hubungi Pak Anggiat jika ada kendala.")
+    st.write("Hubungi Pak Anggiat di ruang dosen jika ada kendala sistem.")
