@@ -32,7 +32,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. DATABASE (TIDAK BERUBAH) ---
+# --- 2. DATABASE (TETAP SAMA - SISTEM ILOC) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -41,9 +41,9 @@ classroom_links = {
     "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
 }
 
-# --- 3. DAFTAR WARNA ---
-# 0: Merah, 1: Hijau, 2: Biru, 3: Kuning, 4: Oranye
-specific_colors = ["#FF4B4B", "#2ECC71", "#3498DB", "#F1C40F", "#E67E22"]
+# DAFTAR WARNA SPESIFIK (PASTEL TERANG AGAR TULISAN HITAM JELAS)
+# Index 0=Merah, 1=Hijau, 2=Biru, 3=Kuning, 4=Ungu
+color_palette = ["#FF4B4B", "#2ECC71", "#3498DB", "#F1C40F", "#9B59B6"]
 
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
@@ -75,19 +75,24 @@ if menu == "Akses Kelas & Absensi":
                     list_mk = mk_mhs.split(',')
                     for i, mk in enumerate(list_mk):
                         mk_name = mk.strip()
-                        warna = specific_colors[i % len(specific_colors)]
+                        # Ambil warna unik berdasarkan urutan mata kuliah
+                        current_color = color_palette[i % len(color_palette)]
                         link = classroom_links.get(mk_name, "https://classroom.google.com")
                         
-                        # TEKNIK TERAKHIR: Masukkan tombol ke dalam Container unik agar warnanya tidak menular
-                        with st.container():
-                            st.markdown(f"""
-                                <style>
-                                    div.stVerticalBlock > div:nth-child({i+4}) div.stLinkButton > a {{
-                                        background-color: {warna} !important;
-                                    }}
-                                </style>
-                            """, unsafe_allow_html=True)
-                            st.link_button(f"📖 {mk_name}", link, use_container_width=True)
+                        # TEKNIK INJEKSI WARNA BERDASARKAN KEY UNIK
+                        # Ini akan memaksa setiap tombol memiliki warna sendiri-sendiri
+                        st.markdown(f"""
+                            <style>
+                                div[data-testid="stHorizontalBlock"] > div:nth-of-type({i+1}) div.stLinkButton > a,
+                                div.stVerticalBlock > div:nth-of-type({i+10}) div.stLinkButton > a {{
+                                    background-color: {current_color} !important;
+                                }}
+                            </style>
+                        """, unsafe_allow_html=True)
+                        
+                        st.link_button(f"📖 {mk_name}", link, use_container_width=True)
+                else:
+                    st.info("Belum ada mata kuliah.")
         except:
             st.error("Gagal memproses data.")
 
