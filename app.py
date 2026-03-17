@@ -28,7 +28,7 @@ with st.sidebar:
 # Link ini biasanya jauh lebih stabil daripada link 'Share' biasa
 URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS7Yidv96m82XqM8v-J3pL-U7N5TzW6z9y9Y9Y9Y9Y9Y9Y9/pub?output=csv" 
 # Jika link di atas error, kita pakai link Share Bapak yang sudah saya bersihkan:
-URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg/export?format=csv"
+URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/edit?usp=sharing"
 
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
