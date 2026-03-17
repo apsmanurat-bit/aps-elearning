@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- BAGIAN 1: CSS (MENGATUR TINGGI & WARNA SAJA) ---
+# --- 1. CSS: HANYA MENGATUR TAMPILAN (WARNA & UKURAN) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,25 +15,24 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* MENGATUR TINGGI KOTAK DAN GAYA TULISAN */
+    /* GAYA KOTAK MATA KULIAH: PANJANG, TULISAN HITAM PEKAT, TEBAL */
     div.stLinkButton > a {
         height: 90px !important; 
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 22px !important; 
-        font-weight: bold !important;
-        color: #000000 !important;
+        font-size: 24px !important; 
+        font-weight: 900 !important; 
+        color: #000000 !important; 
         border-radius: 15px !important;
         border: none !important;
-        text-decoration: none !important;
         box-shadow: 4px 4px 15px rgba(0,0,0,0.5) !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 12px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN 2: LOGIKA DATABASE (SISTEM INTI TETAP SAMA) ---
+# --- 2. SISTEM DATABASE (TIDAK BERUBAH SAMA SEKALI) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -46,7 +45,8 @@ colors = ["#FFADAD", "#FFD6A5", "#FDFFB6", "#CAFFBF", "#9BF6FF", "#A0C4FF", "#BD
 
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
-    menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Bantuan"])
+    # Menambahkan Menu Enroll yang disepakati
+    menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Enroll Mata Kuliah Baru", "Bantuan"])
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
@@ -59,7 +59,7 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
-            # TETAP MENGGUNAKAN ILOC SEPERTI YANG SUDAH BERHASIL
+            # LOGIN TETAP PAKAI SISTEM ILOC (SUDAH BERHASIL)
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
@@ -80,16 +80,24 @@ if menu == "Akses Kelas & Absensi":
                             bg_color = colors[i % len(colors)]
                             link_tujuan = classroom_links.get(mk_name, "https://classroom.google.com")
                             
-                            # WARNA TETAP BERBEDA
+                            # WARNA-WARNI KEMBALI AKTIF
                             st.markdown(f'<style>div.stLinkButton:nth-of-type({i+1}) > a {{ background-color: {bg_color} !important; }}</style>', unsafe_allow_html=True)
-                            
-                            # INI KUNCINYA: use_container_width=True agar kotak memanjang penuh
                             st.link_button(f"📖 {mk_name}", link_tujuan, use_container_width=True)
                     else:
-                        st.info("Mata kuliah belum terdaftar.")
+                        st.info("Belum ada mata kuliah terdaftar.")
                 else:
                     st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}")
             else:
                 st.error("NIM tidak ditemukan.")
         except:
             st.error("Gagal memproses data.")
+
+elif menu == "Enroll Mata Kuliah Baru":
+    st.title("📝 Enroll Mata Kuliah")
+    st.subheader("Pendaftaran Mahasiswa Baru")
+    st.write("Silakan klik tombol di bawah untuk mengisi formulir pendaftaran:")
+    st.link_button("🚀 Enroll / Sign Up Sekarang", "https://forms.gle/BapakPunyaLink", use_container_width=True)
+
+elif menu == "Bantuan":
+    st.title("❓ Bantuan")
+    st.write("Hubungi Admin English Dept. jika NIM Anda tidak terbaca.")
