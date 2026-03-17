@@ -4,7 +4,7 @@ import pandas as pd
 # 1. Konfigurasi Halaman
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
-# 2. Gaya Visual (Background & Sidebar)
+# 2. Gaya Visual (PENTING: Memastikan teks terbaca dengan latar belakang gelap)
 st.markdown("""
 <style>
     .stApp {
@@ -29,7 +29,6 @@ with st.sidebar:
 
 # 4. LINK DATABASE (FORMAT EXPORT TERKUAT)
 SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
-# Mengarahkan ke GID 747045750 (Form Responses 1)
 URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
 
 # --- LOGIKA MENU ---
@@ -38,24 +37,25 @@ if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
     st.divider()
     
-    # --- MENU ENROLLMENT (KITA KEMBALIKAN DI SINI) ---
+    # --- MENU ENROLLMENT (Link Sudah Diperbaiki) ---
     st.subheader("📝 New Student?")
-    st.write("Belum terdaftar di database? Silakan isi form pendaftaran di bawah ini:")
-    st.link_button("Click Here to Enroll / Sign Up", "https://forms.gle/vP9n3D8Z5u8y5X6X9")
+    st.write("Belum terdaftar? Silakan klik tombol di bawah untuk mengisi formulir pendaftaran:")
+    # Link panjang yang Bapak berikan sudah saya pasang di sini
+    st.link_button("Click Here to Enroll / Sign Up", "https://docs.google.com/forms/d/e/1FAIpQLSfBTCp9tKuRoCODRtofnjlf4wd-0BmnHEt9SnQSiiMFH75v2Q/viewform?usp=sharing")
     
     st.divider()
 
     # --- MENU CEK NIM ---
     st.subheader("🔐 Access Your Class")
-    st.write("Masukkan NIM Bapak/Ibu untuk cek status akses:")
-    nim_input = st.text_input("Enter NIM (Example: 1234567)")
+    st.write("Masukkan NIM untuk cek status persetujuan:")
+    nim_input = st.text_input("Enter NIM")
 
     if nim_input:
         try:
             # Membaca data
             df = pd.read_csv(URL_DATABASE)
             
-            # Membersihkan nama kolom (ke huruf besar)
+            # Membersihkan nama kolom
             df.columns = [c.strip().upper() for c in df.columns]
             
             # Cari NIM mahasiswa
@@ -71,19 +71,19 @@ if menu == "Akses Kelas & Absensi":
                 if status_mhs == "APPROVED":
                     st.success(f"Welcome, {nama_mhs}! Status Anda: APPROVED.")
                     st.balloons()
-                    st.info("Silakan buka menu 'Materi (Classroom)' di samping kiri.")
+                    st.info("Silakan akses materi melalui menu di samping kiri.")
                 else:
-                    st.warning(f"Halo {nama_mhs}, status Anda saat ini: {status_mhs}. Hubungi Pak Anggiat.")
+                    st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}. Silakan hubungi Pak Anggiat.")
             else:
-                st.error("NIM tidak ditemukan. Pastikan Anda sudah mengisi form di atas.")
+                st.error("NIM tidak ditemukan. Silakan isi form enrollment di atas.")
         except Exception as e:
-            st.error("Koneksi database terhambat. Pastikan internet stabil.")
+            st.error("Gagal memuat database. Mohon coba lagi beberapa saat lagi.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
-    st.write("Portal materi di Google Classroom:")
-    st.link_button("🚀 Masuk ke Google Classroom", "https://classroom.google.com/") 
+    st.write("Klik tombol di bawah untuk menuju Google Classroom:")
+    st.link_button("🚀 Buka Google Classroom", "https://classroom.google.com/") 
 
 elif menu == "Bantuan":
     st.title("❓ Bantuan")
-    st.write("Ada kendala? Silakan hubungi Pak Anggiat langsung di kampus.")
+    st.write("Ada kendala? Hubungi Pak Anggiat Simamora di kantor dosen English Dept.")
