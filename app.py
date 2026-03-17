@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-# --- BAGIAN 1: CSS (MENGEMBALIKAN UKURAN KOTAK MENJADI BESAR) ---
+# --- BAGIAN 1: CSS (KOTAK DIPERPANJANG FULL WIDTH) ---
+# Bagian ini hanya mengatur "Baju" atau tampilan, bukan mesin aplikasi.
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,14 +16,14 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* MENGEMBALIKAN KOTAK MENJADI BESAR DAN TINGGI */
+    /* KOTAK DIPERPANJANG HORIZONTAL (FULL WIDTH) */
     div.stLinkButton > a {
-        width: 100% !important;
-        height: 100px !important; /* TINGGI KOTAK KITA KEMBALIKAN */
+        width: 100% !important; 
+        height: 80px !important; 
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 22px !important; /* UKURAN TULISAN DIPERBESAR */
+        font-size: 22px !important; 
         font-weight: bold !important;
         color: #000000 !important;
         border-radius: 15px !important;
@@ -30,16 +31,11 @@ st.markdown("""
         text-decoration: none !important;
         box-shadow: 4px 4px 15px rgba(0,0,0,0.5) !important;
         margin-bottom: 20px !important;
-        transition: 0.3s !important;
-    }
-    div.stLinkButton > a:hover {
-        transform: translateY(-5px) !important;
-        box-shadow: 6px 6px 20px rgba(0,0,0,0.6) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN 2: LOGIKA DATABASE (TETAP SAMA / TIDAK BERUBAH) ---
+# --- BAGIAN 2: LOGIKA DATABASE (SISTEM INTI - TIDAK SAYA UBAH) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -65,6 +61,7 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
+            # MENGGUNAKAN SISTEM ILOC YANG SUDAH BERHASIL
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
@@ -86,7 +83,6 @@ if menu == "Akses Kelas & Absensi":
                             bg_color = colors[i % len(colors)]
                             link_tujuan = classroom_links.get(mk_name, "https://classroom.google.com")
                             
-                            # Terapkan warna ke masing-masing kotak besar
                             st.markdown(f'<style>div.stLinkButton:nth-of-type({i+1}) > a {{ background-color: {bg_color} !important; }}</style>', unsafe_allow_html=True)
                             st.link_button(f"📖 {mk_name}", link_tujuan)
                     else:
