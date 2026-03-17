@@ -27,8 +27,8 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 4. LINK DATABASE (CARA BARU YANG LEBIH SIMPEL)
-# Saya menyatukan linknya agar sistem tidak bingung
+# 4. LINK DATABASE (SUDAH DIPERBAIKI SESUAI LINK BAPAK)
+# Perhatikan huruf kecil di ID ini, Pak
 URL_DATABASE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg/export?format=csv"
 
 # --- LOGIKA MENU ---
@@ -46,17 +46,20 @@ if menu == "Akses Kelas & Absensi":
             # Membaca data
             df = pd.read_csv(URL_DATABASE)
             
-            # Membersihkan kolom (agar tidak peka huruf besar/kecil)
+            # Membersihkan nama kolom
             df.columns = [c.strip().upper() for c in df.columns]
             
             # Cari NIM
             target_nim = str(nim_input).strip()
-            student_data = df[df['NIM'].astype(str).str.strip() == target_nim]
+            # Membersihkan data NIM di tabel dari spasi
+            df['NIM'] = df['NIM'].astype(str).str.strip()
+            
+            student_data = df[df['NIM'] == target_nim]
             
             if not student_data.empty:
-                status = student_data.iloc[0]['STATUS']
+                status = str(student_data.iloc[0]['STATUS']).strip().upper()
                 nama = student_data.iloc[0]['NAMA']
-                if str(status).strip().upper() == "APPROVED":
+                if status == "APPROVED":
                     st.success(f"Welcome, {nama}! Your status is APPROVED.")
                     st.balloons()
                 else:
@@ -64,14 +67,14 @@ if menu == "Akses Kelas & Absensi":
             else:
                 st.error("NIM tidak ditemukan di database.")
         except Exception as e:
-            st.error("Koneksi Database Terputus.")
-            st.info("Pastikan Google Sheets sudah di-set 'Anyone with the link'.")
+            st.error("Gagal membaca data.")
+            st.info("Pastikan kolom di Excel Bapak berjudul: NAMA, NIM, dan STATUS.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
-    st.write("Silakan klik mata kuliah Anda:")
+    st.write("Silakan masuk ke portal materi:")
     st.link_button("🚀 Buka Google Classroom", "https://classroom.google.com/") 
 
 elif menu == "Bantuan":
     st.title("❓ Bantuan")
-    st.write("Hubungi Pak Anggiat jika NIM tidak terdaftar.")
+    st.write("Hubungi Pak Anggiat jika ada kendala.")
