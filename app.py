@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Setting Tampilan
+# 1. Konfigurasi Halaman & Gaya Visual
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -23,8 +23,8 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 2. Link Database
-URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg/export?format=csv"
+# 2. Link Database (Sesuai Link Bapak)
+URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
@@ -34,19 +34,20 @@ if menu == "Akses Kelas & Absensi":
 
     if nim_input:
         try:
+            # Mengambil data dari Google Sheets
             df = pd.read_csv(URL_SHARE)
             
-            # Membersihkan nama kolom dari spasi yang tidak sengaja terketik
+            # Membersihkan spasi pada judul kolom
             df.columns = [str(c).strip() for c in df.columns]
             
-            # Mencocokkan NIM
+            # Pencocokan NIM
             target_nim = str(nim_input).strip()
             df['NIM'] = df['NIM'].astype(str).str.strip()
             
             student_data = df[df['NIM'] == target_nim]
             
             if not student_data.empty:
-                # Mengambil NAMA dan Status (Sesuai format kolom Bapak)
+                # MENGGUNAKAN KOLOM 'NAMA' DAN 'Status' (Sesuai Gambar Bapak)
                 nama_mhs = student_data.iloc[0]['NAMA']
                 status_mhs = str(student_data.iloc[0]['Status']).strip().upper()
                 
@@ -59,7 +60,7 @@ if menu == "Akses Kelas & Absensi":
                 st.error("NIM tidak ditemukan. Mohon pastikan NIM benar.")
                 
         except Exception as e:
-            st.error("Judul kolom di Excel belum sesuai. Pastikan ada kolom bernama 'NAMA', 'NIM', dan 'Status'.")
+            st.error("Sistem gagal membaca data. Pastikan Google Sheets sudah 'Anyone with the link'.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi")
