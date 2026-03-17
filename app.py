@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. CSS DASAR (UKURAN & TULISAN) ---
+# --- 1. CSS DASAR (TAMPILAN) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,44 +15,35 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* GAYA UMUM TOMBOL */
+    /* GAYA TOMBOL: TULISAN HITAM & SANGAT TEBAL */
     div.stLinkButton > a {
-        height: 90px !important; 
+        height: 100px !important; 
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 24px !important; 
+        font-size: 26px !important; 
         font-weight: 900 !important; 
         color: #000000 !important; 
         border-radius: 15px !important;
         border: none !important;
         box-shadow: 4px 4px 15px rgba(0,0,0,0.5) !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 20px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC AMAN) ---
+# --- 2. DATABASE (TIDAK BERUBAH) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
-# Daftar link classroom yang Bapak berikan
 classroom_links = {
     "Pancasila Education": "https://classroom.google.com/c/ODUxODU1NDQxNjAw?cjc=skdvjw4",
     "Communicative Grammar II": "https://classroom.google.com/c/ODUxODU2MDg1NDA2?cjc=v5wvneku",
     "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
 }
 
-# --- 3. PEMILIHAN WARNA SPESIFIK ---
-def get_color(mk_name):
-    mk_name = mk_name.lower()
-    if "translation" in mk_name:
-        return "#FF4B4B"  # MERAH
-    elif "grammar" in mk_name:
-        return "#2ECC71"  # HIJAU
-    elif "pancasila" in mk_name:
-        return "#3498DB"  # BIRU
-    else:
-        return "#F1C40F"  # KUNING (Default)
+# --- 3. DAFTAR WARNA ---
+# 0: Merah, 1: Hijau, 2: Biru, 3: Kuning, 4: Oranye
+specific_colors = ["#FF4B4B", "#2ECC71", "#3498DB", "#F1C40F", "#E67E22"]
 
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
@@ -84,19 +75,19 @@ if menu == "Akses Kelas & Absensi":
                     list_mk = mk_mhs.split(',')
                     for i, mk in enumerate(list_mk):
                         mk_name = mk.strip()
-                        warna = get_color(mk_name)
+                        warna = specific_colors[i % len(specific_colors)]
                         link = classroom_links.get(mk_name, "https://classroom.google.com")
                         
-                        # TEKNIK BARU: Paksa CSS berdasarkan urutan tombol agar warna tidak tertukar
-                        st.markdown(f"""
-                            <style>
-                            div.stLinkButton:nth-of-type({i+1}) > a {{
-                                background-color: {warna} !important;
-                            }}
-                            </style>
-                        """, unsafe_allow_html=True)
-                        
-                        st.link_button(f"📖 {mk_name}", link, use_container_width=True)
+                        # TEKNIK TERAKHIR: Masukkan tombol ke dalam Container unik agar warnanya tidak menular
+                        with st.container():
+                            st.markdown(f"""
+                                <style>
+                                    div.stVerticalBlock > div:nth-child({i+4}) div.stLinkButton > a {{
+                                        background-color: {warna} !important;
+                                    }}
+                                </style>
+                            """, unsafe_allow_html=True)
+                            st.link_button(f"📖 {mk_name}", link, use_container_width=True)
         except:
             st.error("Gagal memproses data.")
 
