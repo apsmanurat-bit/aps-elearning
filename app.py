@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. CSS DASAR (TAMPILAN) ---
+# --- 1. KONFIGURASI HALAMAN ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,24 +15,33 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* GAYA TOMBOL: TULISAN HITAM & SANGAT TEBAL */
-    div.stLinkButton > a {
-        height: 100px !important; 
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 26px !important; 
-        font-weight: 900 !important; 
-        color: #000000 !important; 
-        border-radius: 15px !important;
-        border: none !important;
-        box-shadow: 4px 4px 15px rgba(0,0,0,0.5) !important;
-        margin-bottom: 20px !important;
+    /* GAYA KOTAK ARTISTIK & PROPORSIONAL */
+    .course-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 120px; /* Tinggi kotak lebih gagah */
+        border-radius: 20px;
+        margin-bottom: 25px;
+        text-decoration: none;
+        color: #000000 !important;
+        font-size: 35px !important; /* Tulisan Besar & Mantap */
+        font-weight: 900;
+        box-shadow: 8px 8px 20px rgba(0,0,0,0.5);
+        border: 3px solid rgba(255,255,255,0.3);
+        transition: all 0.3s ease-in-out;
+        text-align: center;
+    }
+    .course-card:hover {
+        transform: translateY(-5px) scale(1.01);
+        filter: brightness(1.1);
+        box-shadow: 10px 10px 25px rgba(0,0,0,0.6);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. DATABASE (TETAP SAMA - SISTEM ILOC) ---
+# --- 2. SISTEM DATABASE (TETAP SAMA - ILOC AMAN) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -41,9 +50,8 @@ classroom_links = {
     "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
 }
 
-# DAFTAR WARNA SPESIFIK (PASTEL TERANG AGAR TULISAN HITAM JELAS)
-# Index 0=Merah, 1=Hijau, 2=Biru, 3=Kuning, 4=Ungu
-color_palette = ["#FF4B4B", "#2ECC71", "#3498DB", "#F1C40F", "#9B59B6"]
+# WARNA SENI: Merah Berani, Hijau Segar, Biru Cerah, Kuning Emas
+color_palette = ["#FF5E5E", "#46EB7E", "#58CCFF", "#F1C40F", "#FF9F43"]
 
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
@@ -75,27 +83,25 @@ if menu == "Akses Kelas & Absensi":
                     list_mk = mk_mhs.split(',')
                     for i, mk in enumerate(list_mk):
                         mk_name = mk.strip()
-                        # Ambil warna unik berdasarkan urutan mata kuliah
+                        # Setiap MK ambil warna berbeda dari palette
                         current_color = color_palette[i % len(color_palette)]
                         link = classroom_links.get(mk_name, "https://classroom.google.com")
                         
-                        # TEKNIK INJEKSI WARNA BERDASARKAN KEY UNIK
-                        # Ini akan memaksa setiap tombol memiliki warna sendiri-sendiri
+                        # Tampilan Kotak Full Width dengan HTML Injection
                         st.markdown(f"""
-                            <style>
-                                div[data-testid="stHorizontalBlock"] > div:nth-of-type({i+1}) div.stLinkButton > a,
-                                div.stVerticalBlock > div:nth-of-type({i+10}) div.stLinkButton > a {{
-                                    background-color: {current_color} !important;
-                                }}
-                            </style>
+                            <a href="{link}" target="_blank" class="course-card" style="background-color: {current_color};">
+                                📖 {mk_name}
+                            </a>
                         """, unsafe_allow_html=True)
-                        
-                        st.link_button(f"📖 {mk_name}", link, use_container_width=True)
                 else:
-                    st.info("Belum ada mata kuliah.")
+                    st.info("Belum ada mata kuliah terdaftar.")
         except:
             st.error("Gagal memproses data.")
 
 elif menu == "Enroll Mata Kuliah Baru":
     st.title("📝 Enroll Mata Kuliah")
-    st.link_button("🚀 Enroll Sekarang", "https://forms.gle/BapakPunyaLink", use_container_width=True)
+    st.markdown("""
+        <a href="https://forms.gle/BapakPunyaLink" target="_blank" class="course-card" style="background-color: #FF9F43;">
+            🚀 Enroll / Sign Up Sekarang
+        </a>
+    """, unsafe_allow_html=True)
