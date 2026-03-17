@@ -1,11 +1,19 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. KONFIGURASI HALAMAN ---
+# --- 1. CSS: HANYA UNTUK TAMPILAN (LOGIKA TIDAK DISENTUH) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
 <style>
+    /* MERUBAH WARNA HEADER BAWAAN STREAMLIT AGAR KEREN (Sesuai Gambar) */
+    header[data-testid="stHeader"] {
+        background: linear-gradient(to right, #1e3c72, #6a11cb, #ff4b2b) !important;
+    }
+    header[data-testid="stHeader"] * {
+        color: white !important;
+    }
+
     .stApp {
         background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
                     url("https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
@@ -15,18 +23,18 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* GAYA KOTAK ARTISTIK & PROPORSIONAL */
+    /* GAYA KOTAK MATA KULIAH (Tetap Proporsional & Berwarna-warni) */
     .course-card {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
-        height: 120px; /* Tinggi kotak lebih gagah */
+        height: 120px;
         border-radius: 20px;
         margin-bottom: 25px;
         text-decoration: none;
         color: #000000 !important;
-        font-size: 35px !important; /* Tulisan Besar & Mantap */
+        font-size: 35px !important;
         font-weight: 900;
         box-shadow: 8px 8px 20px rgba(0,0,0,0.5);
         border: 3px solid rgba(255,255,255,0.3);
@@ -36,12 +44,11 @@ st.markdown("""
     .course-card:hover {
         transform: translateY(-5px) scale(1.01);
         filter: brightness(1.1);
-        box-shadow: 10px 10px 25px rgba(0,0,0,0.6);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TETAP SAMA - ILOC AMAN) ---
+# --- 2. SISTEM DATABASE (BAGIAN INI SANGAT DIJAGA - TIDAK DIUBAH) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -50,7 +57,6 @@ classroom_links = {
     "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
 }
 
-# WARNA SENI: Merah Berani, Hijau Segar, Biru Cerah, Kuning Emas
 color_palette = ["#FF5E5E", "#46EB7E", "#58CCFF", "#F1C40F", "#FF9F43"]
 
 with st.sidebar:
@@ -68,6 +74,7 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
+            # MESIN UTAMA (ILOC) TETAP ASLI
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
@@ -83,11 +90,9 @@ if menu == "Akses Kelas & Absensi":
                     list_mk = mk_mhs.split(',')
                     for i, mk in enumerate(list_mk):
                         mk_name = mk.strip()
-                        # Setiap MK ambil warna berbeda dari palette
                         current_color = color_palette[i % len(color_palette)]
                         link = classroom_links.get(mk_name, "https://classroom.google.com")
                         
-                        # Tampilan Kotak Full Width dengan HTML Injection
                         st.markdown(f"""
                             <a href="{link}" target="_blank" class="course-card" style="background-color: {current_color};">
                                 📖 {mk_name}
