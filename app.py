@@ -4,94 +4,97 @@ import pandas as pd
 # 1. Konfigurasi Halaman
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
-# 2. Gaya Visual (Emas - Biru Tua)
+# 2. Gaya Visual (Gambar Latar Profesional - SIAP PAKAI)
 st.markdown("""
-    <style>
-    .stApp { background-color: #003366 !important; }
-    h1, h2, h3, h4, p, span, label { color: #ffffff !important; }
+<style>
+    /* Menambahkan Gambar Latar dengan Efek Gelap agar Teks Jelas */
+    .stApp {
+        background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
+                    url("https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    /* Warna Teks Putih dengan Bayangan */
+    h1, h2, h3, h4, p, span, label { 
+        color: #ffffff !important; 
+        text-shadow: 1px 1px 3px #000000;
+    }
+
+    /* Kotak Input agar tulisan mahasiswa tetap hitam dan jelas */
+    .stTextInput input {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Gaya Tombol Emas (Enroll) */
     .stLinkButton a {
-        background-color: #FFD700 !important; 
-        border-radius: 10px !important;
-        margin-bottom: 10px !important;
+        background-color: #FFD700 !important;
+        border-radius: 12px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        text-decoration: none !important;
+        border: none !important;
+        height: 50px !important;
     }
-    .stLinkButton a p { color: #000000 !important; font-weight: bold !important; font-size: 18px !important; }
-    .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
-    </style>
-    """, unsafe_allow_html=True)
+    
+    .stLinkButton a p {
+        color: #000000 !important;
+        font-weight: bold !important;
+        font-size: 18px !important;
+        margin: 0 !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
+# 3. Judul Utama
 st.title("🎓 AngietClass E-Learning")
 st.markdown("<h4 style='text-align: center;'>English Dept. Politeknik MBP</h4>", unsafe_allow_html=True)
 st.divider()
 
-# 4. Link Database
-SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg"
+# 4. Link Database (Google Sheets)
+SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
 URL_CSV = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
 
-# 5. Tombol Pendaftaran
+# 5. Bagian Pendaftaran (New Student)
 st.subheader("📝 New Student?")
-link_form = "https://docs.google.com/forms/d/e/1FAIpQLSfBTCp9tKuRoCODRtofnjlf4wd-0BmnHEt9SnQSiiMFH75v2Q/viewform?usp=sf_link"
-st.link_button("Click Here to Enroll", link_form, use_container_width=True)
+st.link_button("Click Here to Enroll", "https://forms.gle/vP9n3D8Z5u8y5X6X9") # Ganti dengan link Google Form Bapak jika perlu
 
-st.divider()
+st.write("")
+st.write("")
 
-# 6. Fitur Pengecekan Akses
-st.subheader("🔓 Access Your Class")
-check_nim = st.text_input("Enter your NIM to check approval status")
+# 6. Bagian Akses Kelas (Cek NIM)
+st.subheader("🔐 Access Your Class")
+nim_input = st.text_input("Enter your NIM to check approval status")
 
-# Daftar Link Undangan (Pastikan Nama di Sini Mirip dengan di Form Bapak)
-links = {
-    "MORAL PHILOSOPHY": "https://classroom.google.com/c/ODUxODU3NzA1MjQz?cjc=gxaxonqf",
-    "RESEARCH METHODOLOGY": "https://classroom.google.com/c/ODUxODU4NzU3NDYy?cjc=ywl7b5c2",
-    "TRANSLATION II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzhq",
-    "COMMUNICATIVE GRAMMAR II": "https://classroom.google.com/c/ODUxODU2MDg1NDA2?cjc=v5wvneku",
-    "PUBLIC SPEAKING": "https://classroom.google.com/c/ODUxODU1Mzk1NDAx?cjc=lhzfnqqd",
-    "PENDIDIKAN PANCASILA": "https://classroom.google.com/c/ODUxODU1NDQxNjAw?cjc=skdvjw4v",
-    "COMMUNICATIVE GRAMMAR I": "https://classroom.google.com/c/ODQ4MjMwNzg1NjM5?cjc=4rt3q34b"
-}
-
-if check_nim:
+if nim_input:
     try:
+        # Membaca data dari Google Sheets
         df = pd.read_csv(URL_CSV)
-        df.columns = [str(c).strip().upper() for c in df.columns]
         
-        col_nim = next((c for c in df.columns if 'NIM' in c), None)
-        col_status = next((c for c in df.columns if 'STATUS' in c), None)
-        # Mencari kolom mata kuliah (biasanya berisi kata 'MATA' atau 'PILIH' atau 'WHICH')
-        col_mk = next((c for c in df.columns if any(x in c for x in ['MATA', 'COURSE', 'PILIH', 'WHICH'])), None)
-
-        if col_nim and col_status:
-            user_data = df[df[col_nim].astype(str).str.strip() == str(check_nim).strip()]
+        # Pastikan kolom NIM dibaca sebagai string agar tidak error
+        df['NIM'] = df['NIM'].astype(str)
+        
+        # Cek apakah NIM ada di database
+        student_data = df[df['NIM'] == nim_input.strip()]
+        
+        if not student_data.empty:
+            status = student_data.iloc[0]['STATUS']
+            nama = student_data.iloc[0]['NAMA']
             
-            if not user_data.empty:
-                # Ambil baris terbaru (paling bawah) jika mahasiswa daftar dua kali
-                latest_entry = user_data.iloc[-1]
-                status_val = str(latest_entry[col_status]).strip().upper()
-                
-                if status_val == "APPROVED":
-                    st.success("✅ Access Granted! Your Classes:")
-                    
-                    if col_mk:
-                        # Mengambil pilihan mata kuliah (misal: "Public Speaking, Translation II")
-                        pilihan_user = str(latest_entry[col_mk]).upper()
-                        
-                        # Loop mengecek setiap mata kuliah di daftar links
-                        for nama_mk, link_url in links.items():
-                            if nama_mk in pilihan_user:
-                                st.link_button(f"Enter {nama_mk} Room", link_url, use_container_width=True)
-                    else:
-                        st.warning("Kolom pilihan mata kuliah tidak ditemukan di Sheets.")
-                else:
-                    st.warning("⚠️ Status: PENDING. Tunggu persetujuan Pak Anggiat.")
+            if status.upper() == "APPROVED":
+                st.success(f"Welcome, {nama}! Your status is APPROVED.")
+                st.info("Please select your course from the sidebar (Coming Soon).")
             else:
-                st.error("❌ NIM tidak ditemukan.")
+                st.warning(f"Hello {nama}, your status is still: {status}. Please contact Mr. Anggiat.")
         else:
-            st.error("Kolom NIM atau STATUS tidak ditemukan di Sheets.")
+            st.error("NIM not found. Please enroll first or check your NIM again.")
             
     except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+        st.error("Connection error. Please try again later.")
 
+# 7. Penutup Footer
 st.divider()
-st.caption("© 2026 AngietClass E-Learning - Developed by Mr. Angiet")
+st.caption("© 2026 Mr. Angiet Grammar Lite - English Dept. Politeknik MBP")
