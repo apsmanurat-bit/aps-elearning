@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- BAGIAN 1: CSS (KOTAK DIPERPANJANG FULL WIDTH) ---
-# Bagian ini hanya mengatur "Baju" atau tampilan, bukan mesin aplikasi.
+# --- BAGIAN 1: CSS (MENGATUR TINGGI & WARNA SAJA) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -16,10 +15,9 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* KOTAK DIPERPANJANG HORIZONTAL (FULL WIDTH) */
+    /* MENGATUR TINGGI KOTAK DAN GAYA TULISAN */
     div.stLinkButton > a {
-        width: 100% !important; 
-        height: 80px !important; 
+        height: 90px !important; 
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -30,12 +28,12 @@ st.markdown("""
         border: none !important;
         text-decoration: none !important;
         box-shadow: 4px 4px 15px rgba(0,0,0,0.5) !important;
-        margin-bottom: 20px !important;
+        margin-bottom: 10px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN 2: LOGIKA DATABASE (SISTEM INTI - TIDAK SAYA UBAH) ---
+# --- BAGIAN 2: LOGIKA DATABASE (SISTEM INTI TETAP SAMA) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -61,7 +59,7 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
-            # MENGGUNAKAN SISTEM ILOC YANG SUDAH BERHASIL
+            # TETAP MENGGUNAKAN ILOC SEPERTI YANG SUDAH BERHASIL
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
@@ -72,7 +70,6 @@ if menu == "Akses Kelas & Absensi":
                 
                 if status_mhs == "APPROVED":
                     st.success(f"Welcome, {nama_mhs}! Status: APPROVED ✅")
-                    
                     st.divider()
                     st.subheader("📚 Klik Mata Kuliah untuk Masuk Classroom:")
                     
@@ -83,8 +80,11 @@ if menu == "Akses Kelas & Absensi":
                             bg_color = colors[i % len(colors)]
                             link_tujuan = classroom_links.get(mk_name, "https://classroom.google.com")
                             
+                            # WARNA TETAP BERBEDA
                             st.markdown(f'<style>div.stLinkButton:nth-of-type({i+1}) > a {{ background-color: {bg_color} !important; }}</style>', unsafe_allow_html=True)
-                            st.link_button(f"📖 {mk_name}", link_tujuan)
+                            
+                            # INI KUNCINYA: use_container_width=True agar kotak memanjang penuh
+                            st.link_button(f"📖 {mk_name}", link_tujuan, use_container_width=True)
                     else:
                         st.info("Mata kuliah belum terdaftar.")
                 else:
