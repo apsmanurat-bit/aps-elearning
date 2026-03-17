@@ -4,7 +4,7 @@ import pandas as pd
 # 1. Konfigurasi Halaman
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
-# 2. Gaya Visual (Gambar Latar & Sidebar)
+# 2. Gaya Visual (PENTING: Memperbaiki Tampilan & Sidebar)
 st.markdown("""
 <style>
     .stApp {
@@ -14,30 +14,24 @@ st.markdown("""
         background-position: center;
         background-attachment: fixed;
     }
-    h1, h2, h3, h4, p, span, label { 
-        color: #ffffff !important; 
-        text-shadow: 1px 1px 3px #000000;
-    }
-    .stTextInput input {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    [data-testid="stSidebar"] {
-        background-color: rgba(0, 0, 30, 0.9);
-    }
+    h1, h2, h3, h4, p, span, label { color: #ffffff !important; }
+    .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
+    [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Sidebar untuk Navigasi (Gateway ke Google Classroom)
+# 3. Sidebar Navigasi
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
     menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Materi (Classroom)", "Bantuan"])
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 4. Link Database (Sama seperti yang sukses kemarin)
+# 4. LINK DATABASE (MOHON CEK ID INI SANGAT TELITI, PAK)
+# Saya menggunakan ID yang kemarin Bapak gunakan dan berhasil
 SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
-URL_CSV = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
+GID = "747045750"
+URL_CSV = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID}"
 
 # --- LOGIKA MENU ---
 
@@ -51,41 +45,44 @@ if menu == "Akses Kelas & Absensi":
 
     st.write("")
     st.subheader("🔐 Access Your Class")
-    nim_input = st.text_input("Enter your NIM to check approval status")
+    nim_input = st.text_input("Enter your NIM to check status")
 
     if nim_input:
         try:
-            # Bagian ini yang krusial untuk koneksi ke Sheet
+            # Mengambil data dengan penanganan error yang lebih detail
             df = pd.read_csv(URL_CSV)
+            
+            # Membersihkan data NIM (menghilangkan spasi)
             df['NIM'] = df['NIM'].astype(str).str.strip()
-            student_data = df[df['NIM'] == nim_input.strip()]
+            target_nim = str(nim_input).strip()
+            
+            student_data = df[df['NIM'] == target_nim]
             
             if not student_data.empty:
                 status = student_data.iloc[0]['STATUS']
                 nama = student_data.iloc[0]['NAMA']
-                if status.upper() == "APPROVED":
+                if str(status).upper() == "APPROVED":
                     st.success(f"Welcome, {nama}! Your status is APPROVED.")
+                    st.balloons() # Efek perayaan kecil
                     st.info("Pilih menu 'Materi (Classroom)' di samping kiri untuk mulai belajar.")
                 else:
                     st.warning(f"Hello {nama}, your status is: {status}. Please contact Mr. Anggiat.")
             else:
-                st.error("NIM not found. Please enroll first.")
+                st.error("NIM tidak ditemukan. Pastikan sudah mendaftar.")
         except Exception as e:
-            # Jika masih error, sistem akan memberitahu detailnya sedikit
-            st.error(f"Maaf, sistem tidak bisa membaca database. Pastikan koneksi internet stabil.")
+            st.error("Gagal terhubung ke Google Sheets.")
+            st.info("Saran: Buka Google Sheets database Bapak, lalu pastikan menu 'Share' sudah 'Anyone with the link'.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
-    st.write("Silakan klik tombol di bawah untuk masuk ke Google Classroom sesuai mata kuliah Bapak:")
-    
+    st.write("Silakan klik mata kuliah Anda:")
     col1, col2 = st.columns(2)
     with col1:
-        st.link_button("🚀 Public Speaking Class", "https://classroom.google.com/") 
-        st.link_button("📖 Translation I & II Class", "https://classroom.google.com/")
+        st.link_button("🚀 Public Speaking", "https://classroom.google.com/") 
+        st.link_button("📖 Translation I & II", "https://classroom.google.com/")
     with col2:
         st.link_button("✍️ Communicative Grammar", "https://classroom.google.com/")
-        st.link_button("📂 Download Syllabus (RPS)", "https://google.com")
 
 elif menu == "Bantuan":
     st.title("❓ Bantuan")
-    st.write("Hubungi Pak Anggiat jika NIM Bapak/Ibu tidak terdaftar.")
+    st.write("Hubungi Pak Anggiat di kampus jika ada kendala sistem.")
