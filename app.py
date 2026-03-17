@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Konfigurasi Halaman & Gaya Visual
+# 1. Tampilan Utama
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -14,7 +14,7 @@ st.markdown("""
     h1, h2, h3, h4, p, span, label { color: #ffffff !important; text-shadow: 1px 1px 2px #000000; }
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
-    .course-card { background-color: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 10px; border-left: 5px solid #00ff00; margin-bottom: 10px; }
+    .course-card { background-color: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 10px; border-left: 5px solid #00ff00; margin-bottom: 10px; color: white; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -24,61 +24,56 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 2. Link Database
+# 2. Database Link
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
     st.divider()
-    
-    st.subheader("🔐 Access Your Class")
     nim_input = st.text_input("Masukkan NIM Anda")
 
     if nim_input:
         try:
             df = pd.read_csv(URL_SHARE)
-            # Membersihkan nama semua kolom agar tidak sensitif spasi
-            df.columns = [str(c).strip() for c in df.columns]
+            # Membersihkan nama kolom: Hilangkan spasi dan ubah ke HURUF BESAR SEMUA
+            df.columns = [str(c).strip().upper() for c in df.columns]
+            
+            # Cari kolom yang mengandung kata kunci secara otomatis
+            col_nim = [c for c in df.columns if 'NIM' in c][0]
+            col_nama = [c for c in df.columns if 'NAMA' in c or 'MAHASISWA' in c][0]
+            col_status = [c for c in df.columns if 'STATUS' in c][0]
+            col_mk = [c for c in df.columns if 'MATA KULIAH' in c or 'MK' in c][0]
             
             target_nim = str(nim_input).strip()
-            df['NIM'] = df['NIM'].astype(str).str.strip()
+            df[col_nim] = df[col_nim].astype(str).str.strip()
             
-            student_data = df[df['NIM'] == target_nim]
+            student_data = df[df[col_nim] == target_nim]
             
             if not student_data.empty:
-                nama_mhs = student_data.iloc[0]['NAMA']
-                status_raw = str(student_data.iloc[0]['Status']).strip()
+                nama_mhs = student_data.iloc[0][col_nama]
+                status_mhs = str(student_data.iloc[0][col_status]).strip().upper()
+                mk_mhs = str(student_data.iloc[0][col_mk]).strip()
                 
-                if status_raw.upper() == "APPROVED":
-                    st.success(f"Welcome, {nama_mhs}! Status Anda: APPROVED ✅")
+                if status_mhs == "APPROVED":
+                    st.success(f"Welcome, {nama_mhs}! Status: APPROVED ✅")
                     st.balloons()
                     
                     st.divider()
                     st.subheader("📚 Daftar Mata Kuliah Anda:")
-                    
-                    # Mencari kolom Mata Kuliah secara otomatis (fleksibel)
-                    col_mk = [c for c in df.columns if 'Mata Kuliah' in c][0]
-                    mata_kuliah = str(student_data.iloc[0][col_mk]).strip()
-                    
-                    if mata_kuliah and mata_kuliah != 'nan':
-                        list_mk = mata_kuliah.split(',')
+                    if mk_mhs and mk_mhs != 'nan':
+                        list_mk = mk_mhs.split(',')
                         for mk in list_mk:
-                            st.markdown(f"""<div class="course-card">📖 {mk.strip()}</div>""", unsafe_allow_html=True)
+                            st.markdown(f'<div class="course-card">📖 {mk.strip()}</div>', unsafe_allow_html=True)
                     else:
-                        st.info("Belum ada mata kuliah yang terdaftar.")
+                        st.info("Mata kuliah belum diinput di database.")
                 else:
-                    st.warning(f"Halo {nama_mhs}, status Anda saat ini adalah: {status_raw}")
+                    st.warning(f"Halo {nama_mhs}, status Anda saat ini: {status_mhs}")
             else:
-                st.error("NIM tidak ditemukan. Mohon pastikan NIM benar.")
+                st.error("NIM tidak ditemukan.")
                 
         except Exception as e:
-            st.error("Terjadi kendala saat membaca data. Pastikan kolom 'NAMA', 'NIM', 'Status', dan 'Mata Kuliah' sudah ada di Google Sheets.")
+            st.error("Gagal memproses data. Mohon pastikan file Google Sheets tidak sedang diedit.")
 
 elif menu == "Materi (Classroom)":
-    st.title("📚 Materi Perkuliahan")
-    st.write("Silakan klik tombol di bawah untuk masuk ke ruang kelas digital:")
-    st.link_button("🚀 Buka Google Classroom", "https://classroom.google.com/") 
-
-elif menu == "Bantuan":
-    st.title("❓ Bantuan")
-    st.write("Jika NIM Anda tidak terdaftar, silakan hubungi Bapak Anggiat Simamora di kantor Prodi.")
+    st.title("📚 Materi")
+    st.link_button("🚀 Masuk Classroom", "https://classroom.google.com/")
