@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. CSS: HANYA MENGATUR TAMPILAN (WARNA & UKURAN) ---
+# --- 1. CSS: PENGATURAN TAMPILAN (UKURAN & TULISAN) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,7 +15,7 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* GAYA KOTAK MATA KULIAH: PANJANG, TULISAN HITAM PEKAT, TEBAL */
+    /* GAYA DASAR KOTAK: PANJANG, TULISAN HITAM, TEBAL */
     div.stLinkButton > a {
         height: 90px !important; 
         display: flex !important;
@@ -32,7 +32,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TIDAK BERUBAH SAMA SEKALI) ---
+# --- 2. SISTEM DATABASE (TIDAK BERUBAH) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -41,11 +41,11 @@ classroom_links = {
     "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
 }
 
-colors = ["#FFADAD", "#FFD6A5", "#FDFFB6", "#CAFFBF", "#9BF6FF", "#A0C4FF", "#BDB2FF"]
+# Daftar warna spesifik (Merah Pastel, Hijau, Biru, Kuning, Ungu, Oranye, Pink)
+specific_colors = ["#FFADAD", "#CAFFBF", "#9BF6FF", "#FDFFB6", "#BDB2FF", "#FFD6A5", "#FFC6FF"]
 
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
-    # Menambahkan Menu Enroll yang disepakati
     menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Enroll Mata Kuliah Baru", "Bantuan"])
     st.divider()
     st.caption("English Dept. Politeknik MBP")
@@ -59,7 +59,7 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
-            # LOGIN TETAP PAKAI SISTEM ILOC (SUDAH BERHASIL)
+            # LOGIN TETAP PAKAI SISTEM ILOC
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
@@ -77,11 +77,19 @@ if menu == "Akses Kelas & Absensi":
                         list_mk = mk_mhs.split(',')
                         for i, mk in enumerate(list_mk):
                             mk_name = mk.strip()
-                            bg_color = colors[i % len(colors)]
+                            # Mengambil warna berbeda berdasarkan urutan (i)
+                            bg_color = specific_colors[i % len(specific_colors)]
                             link_tujuan = classroom_links.get(mk_name, "https://classroom.google.com")
                             
-                            # WARNA-WARNI KEMBALI AKTIF
-                            st.markdown(f'<style>div.stLinkButton:nth-of-type({i+1}) > a {{ background-color: {bg_color} !important; }}</style>', unsafe_allow_html=True)
+                            # CSS KHUSUS UNTUK SETIAP TOMBOL AGAR WARNANYA BERBEDA
+                            st.markdown(f"""
+                                <style>
+                                    div.stLinkButton:nth-of-type({i+1}) > a {{
+                                        background-color: {bg_color} !important;
+                                    }}
+                                </style>
+                            """, unsafe_allow_html=True)
+                            
                             st.link_button(f"📖 {mk_name}", link_tujuan, use_container_width=True)
                     else:
                         st.info("Belum ada mata kuliah terdaftar.")
@@ -94,10 +102,4 @@ if menu == "Akses Kelas & Absensi":
 
 elif menu == "Enroll Mata Kuliah Baru":
     st.title("📝 Enroll Mata Kuliah")
-    st.subheader("Pendaftaran Mahasiswa Baru")
-    st.write("Silakan klik tombol di bawah untuk mengisi formulir pendaftaran:")
     st.link_button("🚀 Enroll / Sign Up Sekarang", "https://forms.gle/BapakPunyaLink", use_container_width=True)
-
-elif menu == "Bantuan":
-    st.title("❓ Bantuan")
-    st.write("Hubungi Admin English Dept. jika NIM Anda tidak terbaca.")
