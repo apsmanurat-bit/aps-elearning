@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Konfigurasi Halaman & Menu
+# 1. Konfigurasi Halaman & Menu Sidebar
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
-# 2. Gaya Visual Lengkap (Background & Teks Putih)
+# Gaya Visual (Kembali ke desain awal yang Bapak suka)
 st.markdown("""
 <style>
     .stApp {
@@ -18,33 +18,29 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Sidebar (Mengembalikan Menu yang Hilang)
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
     menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Materi (Classroom)", "Bantuan"])
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 4. Link Database (Sesuai ID yang Sudah Terbuka Aksesnya)
-SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
-URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
+# 2. LINK DATABASE (FORMAT PALING STABIL)
+# Saya menggunakan link CSV langsung tanpa variabel SHEET_ID agar tidak ada typo
+URL_DATABASE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg/export?format=csv"
 
-# --- LOGIKA MENU ---
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
     st.divider()
     
-    # Tombol Pendaftaran
-    st.subheader("📝 New Student?")
-    st.link_button("Click Here to Enroll / Sign Up", "https://docs.google.com/forms/d/e/1FAIpQLSfBTCp9tKuRoCODRtofnjlf4wd-0BmnHEt9SnQSiiMFH75v2Q/viewform?usp=sharing")
-    
-    st.divider()
     st.subheader("🔐 Access Your Class")
-    nim_input = st.text_input("Masukkan NIM Anda untuk Cek Status")
+    nim_input = st.text_input("Masukkan NIM Anda")
 
     if nim_input:
         try:
-            df = pd.read_csv(URL_DATABASE)
+            # Menggunakan pandas dengan pengaturan tambahan agar lebih kuat
+            df = pd.read_csv(URL_DATABASE, on_bad_lines='skip')
+            
+            # Membersihkan data (hapus spasi dan buat huruf besar)
             df.columns = [c.strip().upper() for c in df.columns]
             target_nim = str(nim_input).strip()
             df['NIM'] = df['NIM'].astype(str).str.strip()
@@ -61,9 +57,9 @@ if menu == "Akses Kelas & Absensi":
                 else:
                     st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}.")
             else:
-                st.error("NIM tidak ditemukan. Silakan isi form pendaftaran di atas.")
-        except Exception:
-            st.error("Gagal terhubung ke database. Mohon cek koneksi internet.")
+                st.error("NIM tidak ditemukan. Pastikan Anda sudah terdaftar di Google Sheets.")
+        except Exception as e:
+            st.error(f"Gagal terhubung. Pastikan Google Sheets sudah 'Anyone with the link' dan internet stabil.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
@@ -71,4 +67,4 @@ elif menu == "Materi (Classroom)":
 
 elif menu == "Bantuan":
     st.title("❓ Bantuan")
-    st.write("Silakan hubungi Bapak Anggiat Simamora di kantor English Dept. Politeknik MBP.")
+    st.write("Silakan hubungi Bapak Anggiat Simamora di kantor English Dept.")
