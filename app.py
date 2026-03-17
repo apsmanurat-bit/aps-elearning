@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Tampilan Utama
+# 1. Konfigurasi Tampilan
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -14,7 +14,7 @@ st.markdown("""
     h1, h2, h3, h4, p, span, label { color: #ffffff !important; text-shadow: 1px 1px 2px #000000; }
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
-    .course-card { background-color: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 10px; border-left: 5px solid #00ff00; margin-bottom: 10px; color: white; }
+    .course-card { background-color: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 10px; border-left: 5px solid #00ff00; margin-bottom: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -24,8 +24,8 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 2. Database Link
-URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlxl2BWCakg/export?format=csv&gid=747045750"
+# 2. Link Database
+URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
@@ -34,25 +34,26 @@ if menu == "Akses Kelas & Absensi":
 
     if nim_input:
         try:
+            # Membaca file CSV dari Google Sheets
             df = pd.read_csv(URL_SHARE)
-            # Membersihkan nama kolom: Hilangkan spasi dan ubah ke HURUF BESAR SEMUA
-            df.columns = [str(c).strip().upper() for c in df.columns]
             
-            # Cari kolom yang mengandung kata kunci secara otomatis
-            col_nim = [c for c in df.columns if 'NIM' in c][0]
-            col_nama = [c for c in df.columns if 'NAMA' in c or 'MAHASISWA' in c][0]
-            col_status = [c for c in df.columns if 'STATUS' in c][0]
-            col_mk = [c for c in df.columns if 'MATA KULIAH' in c or 'MK' in c][0]
+            # Kita gunakan nomor kolom agar tidak pusing nama judul:
+            # Kolom 1 (index 1) = NAMA
+            # Kolom 2 (index 2) = NIM
+            # Kolom 5 (index 5) = Mata Kuliah
+            # Kolom 6 (index 6) = Status
             
             target_nim = str(nim_input).strip()
-            df[col_nim] = df[col_nim].astype(str).str.strip()
+            # Membersihkan kolom NIM (kolom ke-3 di Excel Bapak)
+            df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             
-            student_data = df[df[col_nim] == target_nim]
+            # Mencari data mahasiswa
+            student_data = df[df.iloc[:, 2] == target_nim]
             
             if not student_data.empty:
-                nama_mhs = student_data.iloc[0][col_nama]
-                status_mhs = str(student_data.iloc[0][col_status]).strip().upper()
-                mk_mhs = str(student_data.iloc[0][col_mk]).strip()
+                nama_mhs = student_data.iloc[0, 1]  # Kolom B (NAMA)
+                mk_mhs = str(student_data.iloc[0, 5]).strip()  # Kolom F (Mata Kuliah)
+                status_mhs = str(student_data.iloc[0, 6]).strip().upper()  # Kolom G (Status)
                 
                 if status_mhs == "APPROVED":
                     st.success(f"Welcome, {nama_mhs}! Status: APPROVED ✅")
@@ -64,15 +65,13 @@ if menu == "Akses Kelas & Absensi":
                         list_mk = mk_mhs.split(',')
                         for mk in list_mk:
                             st.markdown(f'<div class="course-card">📖 {mk.strip()}</div>', unsafe_allow_html=True)
-                    else:
-                        st.info("Mata kuliah belum diinput di database.")
                 else:
                     st.warning(f"Halo {nama_mhs}, status Anda saat ini: {status_mhs}")
             else:
-                st.error("NIM tidak ditemukan.")
+                st.error("NIM tidak ditemukan di database.")
                 
         except Exception as e:
-            st.error("Gagal memproses data. Mohon pastikan file Google Sheets tidak sedang diedit.")
+            st.error(f"Koneksi terganggu. Mohon tunggu 1 menit dan coba lagi.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi")
