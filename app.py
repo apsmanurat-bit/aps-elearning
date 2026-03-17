@@ -14,7 +14,7 @@ st.markdown("""
         background-position: center;
         background-attachment: fixed;
     }
-    h1, h2, h3, h4, p, span, label { color: #ffffff !important; }
+    h1, h2, h3, h4, p, span, label { color: #ffffff !important; text-shadow: 1px 1px 2px #000000; }
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
 </style>
@@ -27,10 +27,10 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 4. LINK DATABASE (SESUAI GOOGLE SHEETS BAPAK)
+# 4. LINK DATABASE (FORMAT EXPORT TERKUAT)
 SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
-# Link khusus untuk langsung membaca sheet "Form Responses 1"
-URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Form%20Responses%201"
+# Mengarahkan ke GID 747045750 (Form Responses 1)
+URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
 
 # --- LOGIKA MENU ---
 
@@ -38,18 +38,27 @@ if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
     st.divider()
     
+    # --- MENU ENROLLMENT (KITA KEMBALIKAN DI SINI) ---
+    st.subheader("📝 New Student?")
+    st.write("Belum terdaftar di database? Silakan isi form pendaftaran di bawah ini:")
+    st.link_button("Click Here to Enroll / Sign Up", "https://forms.gle/vP9n3D8Z5u8y5X6X9")
+    
+    st.divider()
+
+    # --- MENU CEK NIM ---
     st.subheader("🔐 Access Your Class")
-    nim_input = st.text_input("Enter your NIM to check status")
+    st.write("Masukkan NIM Bapak/Ibu untuk cek status akses:")
+    nim_input = st.text_input("Enter NIM (Example: 1234567)")
 
     if nim_input:
         try:
-            # Membaca data dari Google Sheets
+            # Membaca data
             df = pd.read_csv(URL_DATABASE)
             
-            # Membersihkan nama kolom (ke huruf besar & tanpa spasi)
+            # Membersihkan nama kolom (ke huruf besar)
             df.columns = [c.strip().upper() for c in df.columns]
             
-            # Cari NIM mahasiswa (pastikan dibaca sebagai teks)
+            # Cari NIM mahasiswa
             target_nim = str(nim_input).strip()
             df['NIM'] = df['NIM'].astype(str).str.strip()
             
@@ -60,20 +69,21 @@ if menu == "Akses Kelas & Absensi":
                 status_mhs = str(student_data.iloc[0]['STATUS']).strip().upper()
                 
                 if status_mhs == "APPROVED":
-                    st.success(f"Welcome, {nama_mhs}! Your status is APPROVED.")
+                    st.success(f"Welcome, {nama_mhs}! Status Anda: APPROVED.")
                     st.balloons()
+                    st.info("Silakan buka menu 'Materi (Classroom)' di samping kiri.")
                 else:
-                    st.warning(f"Hello {nama_mhs}, your status is: {status_mhs}.")
+                    st.warning(f"Halo {nama_mhs}, status Anda saat ini: {status_mhs}. Hubungi Pak Anggiat.")
             else:
-                st.error("NIM tidak ditemukan. Pastikan Anda sudah terdaftar.")
+                st.error("NIM tidak ditemukan. Pastikan Anda sudah mengisi form di atas.")
         except Exception as e:
-            st.error("Gagal membaca database. Pastikan koneksi internet Bapak stabil.")
+            st.error("Koneksi database terhambat. Pastikan internet stabil.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
-    st.write("Silakan akses Google Classroom Anda:")
-    st.link_button("🚀 Buka Google Classroom", "https://classroom.google.com/") 
+    st.write("Portal materi di Google Classroom:")
+    st.link_button("🚀 Masuk ke Google Classroom", "https://classroom.google.com/") 
 
 elif menu == "Bantuan":
     st.title("❓ Bantuan")
-    st.write("Hubungi Pak Anggiat jika ada kendala sistem.")
+    st.write("Ada kendala? Silakan hubungi Pak Anggiat langsung di kampus.")
