@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- BAGIAN 1: CSS (Tampilan Tombol) ---
+# --- BAGIAN 1: CSS (MENGEMBALIKAN UKURAN KOTAK MENJADI BESAR) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,29 +15,33 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* Membuat Link Button terlihat seperti Kotak Berwarna */
+    /* MENGEMBALIKAN KOTAK MENJADI BESAR DAN TINGGI */
     div.stLinkButton > a {
         width: 100% !important;
-        height: 70px !important;
+        height: 100px !important; /* TINGGI KOTAK KITA KEMBALIKAN */
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 20px !important;
+        font-size: 22px !important; /* UKURAN TULISAN DIPERBESAR */
         font-weight: bold !important;
         color: #000000 !important;
-        border-radius: 12px !important;
+        border-radius: 15px !important;
         border: none !important;
         text-decoration: none !important;
-        box-shadow: 3px 3px 10px rgba(0,0,0,0.4) !important;
-        margin-bottom: 15px !important;
+        box-shadow: 4px 4px 15px rgba(0,0,0,0.5) !important;
+        margin-bottom: 20px !important;
+        transition: 0.3s !important;
+    }
+    div.stLinkButton > a:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 6px 6px 20px rgba(0,0,0,0.6) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BAGIAN 2: LOGIKA DATABASE (TETAP SAMA) ---
+# --- BAGIAN 2: LOGIKA DATABASE (TETAP SAMA / TIDAK BERUBAH) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
-# Daftar link classroom yang Bapak berikan
 classroom_links = {
     "Pancasila Education": "https://classroom.google.com/c/ODUxODU1NDQxNjAw?cjc=skdvjw4",
     "Communicative Grammar II": "https://classroom.google.com/c/ODUxODU2MDg1NDA2?cjc=v5wvneku",
@@ -61,7 +65,6 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
-            # METODE ILOC (TETAP SAMA)
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
@@ -81,11 +84,9 @@ if menu == "Akses Kelas & Absensi":
                         for i, mk in enumerate(list_mk):
                             mk_name = mk.strip()
                             bg_color = colors[i % len(colors)]
-                            
-                            # Ambil link dari kamus, jika tidak ada kirim ke halaman utama Classroom
                             link_tujuan = classroom_links.get(mk_name, "https://classroom.google.com")
                             
-                            # Menampilkan kotak yang bisa diklik dengan warna berbeda
+                            # Terapkan warna ke masing-masing kotak besar
                             st.markdown(f'<style>div.stLinkButton:nth-of-type({i+1}) > a {{ background-color: {bg_color} !important; }}</style>', unsafe_allow_html=True)
                             st.link_button(f"📖 {mk_name}", link_tujuan)
                     else:
