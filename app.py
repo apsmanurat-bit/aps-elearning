@@ -1,38 +1,74 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Judul Halaman
-st.set_page_config(page_title="AngietClass", layout="wide")
-st.title("🎓 AngietClass E-Learning")
-st.write("English Dept. Politeknik MBP")
+# 1. Konfigurasi Halaman & Menu
+st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
-# 2. Link Database (Sudah diperbaiki huruf besar-kecilnya)
+# 2. Gaya Visual Lengkap (Background & Teks Putih)
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
+                    url("https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
+        background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    h1, h2, h3, h4, p, span, label { color: #ffffff !important; text-shadow: 1px 1px 2px #000000; }
+    .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
+    [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
+</style>
+""", unsafe_allow_html=True)
+
+# 3. Sidebar (Mengembalikan Menu yang Hilang)
+with st.sidebar:
+    st.title("👨‍🏫 Menu Utama")
+    menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Materi (Classroom)", "Bantuan"])
+    st.divider()
+    st.caption("English Dept. Politeknik MBP")
+
+# 4. Link Database (Sesuai ID yang Sudah Terbuka Aksesnya)
 SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
 URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
 
-# 3. Input NIM
-nim_input = st.text_input("Masukkan NIM Anda")
+# --- LOGIKA MENU ---
+if menu == "Akses Kelas & Absensi":
+    st.title("🎓 AngietClass E-Learning")
+    st.divider()
+    
+    # Tombol Pendaftaran
+    st.subheader("📝 New Student?")
+    st.link_button("Click Here to Enroll / Sign Up", "https://docs.google.com/forms/d/e/1FAIpQLSfBTCp9tKuRoCODRtofnjlf4wd-0BmnHEt9SnQSiiMFH75v2Q/viewform?usp=sharing")
+    
+    st.divider()
+    st.subheader("🔐 Access Your Class")
+    nim_input = st.text_input("Masukkan NIM Anda untuk Cek Status")
 
-if nim_input:
-    try:
-        # Proses membaca data
-        df = pd.read_csv(URL_DATABASE)
-        df.columns = [c.strip().upper() for c in df.columns]
-        target_nim = str(nim_input).strip()
-        df['NIM'] = df['NIM'].astype(str).str.strip()
-        
-        student_data = df[df['NIM'] == target_nim]
-        
-        if not student_data.empty:
-            nama_mhs = student_data.iloc[0]['NAMA']
-            status_mhs = str(student_data.iloc[0]['STATUS']).strip().upper()
+    if nim_input:
+        try:
+            df = pd.read_csv(URL_DATABASE)
+            df.columns = [c.strip().upper() for c in df.columns]
+            target_nim = str(nim_input).strip()
+            df['NIM'] = df['NIM'].astype(str).str.strip()
             
-            if status_mhs == "APPROVED":
-                st.success(f"Welcome, {nama_mhs}! Status: APPROVED ✅")
-                st.balloons()
+            student_data = df[df['NIM'] == target_nim]
+            
+            if not student_data.empty:
+                nama_mhs = student_data.iloc[0]['NAMA']
+                status_mhs = str(student_data.iloc[0]['STATUS']).strip().upper()
+                
+                if status_mhs == "APPROVED":
+                    st.success(f"Welcome, {nama_mhs}! Status Anda: APPROVED ✅")
+                    st.balloons()
+                else:
+                    st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}.")
             else:
-                st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}")
-        else:
-            st.error("NIM tidak ditemukan. Pastikan Anda sudah terdaftar.")
-    except Exception:
-        st.error("Gagal terhubung ke database. Cek koneksi internet.")
+                st.error("NIM tidak ditemukan. Silakan isi form pendaftaran di atas.")
+        except Exception:
+            st.error("Gagal terhubung ke database. Mohon cek koneksi internet.")
+
+elif menu == "Materi (Classroom)":
+    st.title("📚 Materi Perkuliahan")
+    st.link_button("🚀 Buka Google Classroom", "https://classroom.google.com/") 
+
+elif menu == "Bantuan":
+    st.title("❓ Bantuan")
+    st.write("Silakan hubungi Bapak Anggiat Simamora di kantor English Dept. Politeknik MBP.")
