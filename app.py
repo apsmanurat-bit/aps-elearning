@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Konfigurasi Tampilan
+# 1. Setting Tampilan
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -17,14 +17,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 2. Sidebar
 with st.sidebar:
     st.title("👨‍🏫 Menu Utama")
     menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Materi (Classroom)", "Bantuan"])
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 3. Link Database
+# 2. Link Database
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg/export?format=csv"
 
 if menu == "Akses Kelas & Absensi":
@@ -35,33 +34,32 @@ if menu == "Akses Kelas & Absensi":
 
     if nim_input:
         try:
-            # Membaca Data
             df = pd.read_csv(URL_SHARE)
             
-            # Membersihkan nama kolom (menghilangkan spasi)
+            # Membersihkan nama kolom dari spasi yang tidak sengaja terketik
             df.columns = [str(c).strip() for c in df.columns]
             
-            # Mencari baris berdasarkan kolom 'NIM'
+            # Mencocokkan NIM
             target_nim = str(nim_input).strip()
             df['NIM'] = df['NIM'].astype(str).str.strip()
             
             student_data = df[df['NIM'] == target_nim]
             
             if not student_data.empty:
-                # Mengambil data dari kolom NAMA dan STATUS
+                # Mengambil NAMA dan Status (Sesuai format kolom Bapak)
                 nama_mhs = student_data.iloc[0]['NAMA']
                 status_mhs = str(student_data.iloc[0]['Status']).strip().upper()
                 
                 if status_mhs == "APPROVED":
-                    st.success(f"Welcome, {nama_mhs}! Status: APPROVED ✅")
+                    st.success(f"Welcome, {nama_mhs}! Status Anda: APPROVED ✅")
                     st.balloons()
                 else:
-                    st.warning(f"Halo {nama_mhs}, status Anda saat ini: {status_mhs}")
+                    st.warning(f"Halo {nama_mhs}, status Anda saat ini adalah: {status_mhs}")
             else:
-                st.error("NIM tidak ditemukan. Pastikan NIM yang dimasukkan benar.")
+                st.error("NIM tidak ditemukan. Mohon pastikan NIM benar.")
                 
         except Exception as e:
-            st.error("Gagal membaca kolom. Pastikan judul kolom di Excel adalah: NAMA, NIM, dan Status.")
+            st.error("Judul kolom di Excel belum sesuai. Pastikan ada kolom bernama 'NAMA', 'NIM', dan 'Status'.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi")
