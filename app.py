@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- BAGIAN 1: KONFIGURASI & CSS (Hanya merubah warna tulisan & kotak) ---
+# --- BAGIAN 1: CSS (Tampilan Tombol) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -15,30 +15,42 @@ st.markdown("""
     .stTextInput input { background-color: #ffffff !important; color: #000000 !important; }
     [data-testid="stSidebar"] { background-color: rgba(0, 0, 30, 0.9); }
     
-    /* Warna tulisan di kotak dibuat hitam pekat agar kontras */
-    .course-card {
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        font-weight: bold;
-        font-size: 18px;
-        color: #000000 !important; 
-        box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+    /* Membuat Link Button terlihat seperti Kotak Berwarna */
+    div.stLinkButton > a {
+        width: 100% !important;
+        height: 70px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 20px !important;
+        font-weight: bold !important;
+        color: #000000 !important;
+        border-radius: 12px !important;
+        border: none !important;
+        text-decoration: none !important;
+        box-shadow: 3px 3px 10px rgba(0,0,0,0.4) !important;
+        margin-bottom: 15px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-with st.sidebar:
-    st.title("👨‍🏫 Menu Utama")
-    menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Materi (Classroom)", "Bantuan"])
-    st.divider()
-    st.caption("English Dept. Politeknik MBP")
-
-# --- BAGIAN 2: LOGIKA DATABASE (Tetap sama seperti yang sudah berhasil) ---
+# --- BAGIAN 2: LOGIKA DATABASE (TETAP SAMA) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
-# Daftar warna kotak yang cerah (Pastel)
+# Daftar link classroom yang Bapak berikan
+classroom_links = {
+    "Pancasila Education": "https://classroom.google.com/c/ODUxODU1NDQxNjAw?cjc=skdvjw4",
+    "Communicative Grammar II": "https://classroom.google.com/c/ODUxODU2MDg1NDA2?cjc=v5wvneku",
+    "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
+}
+
 colors = ["#FFADAD", "#FFD6A5", "#FDFFB6", "#CAFFBF", "#9BF6FF", "#A0C4FF", "#BDB2FF"]
+
+with st.sidebar:
+    st.title("👨‍🏫 Menu Utama")
+    menu = st.radio("Pilih Halaman:", ["Akses Kelas & Absensi", "Bantuan"])
+    st.divider()
+    st.caption("English Dept. Politeknik MBP")
 
 if menu == "Akses Kelas & Absensi":
     st.title("🎓 AngietClass E-Learning")
@@ -49,41 +61,38 @@ if menu == "Akses Kelas & Absensi":
         try:
             df = pd.read_csv(URL_SHARE)
             target_nim = str(nim_input).strip()
-            # Tetap menggunakan indeks kolom (Column 2 untuk NIM)
+            # METODE ILOC (TETAP SAMA)
             df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
             student_data = df[df.iloc[:, 2] == target_nim]
             
             if not student_data.empty:
-                nama_mhs = student_data.iloc[0, 1] # Kolom B
-                mk_mhs = str(student_data.iloc[0, 5]).strip() # Kolom F
-                status_mhs = str(student_data.iloc[0, 6]).strip().upper() # Kolom G
+                nama_mhs = student_data.iloc[0, 1]
+                mk_mhs = str(student_data.iloc[0, 5]).strip()
+                status_mhs = str(student_data.iloc[0, 6]).strip().upper()
                 
                 if status_mhs == "APPROVED":
                     st.success(f"Welcome, {nama_mhs}! Status: APPROVED ✅")
-                    st.balloons()
                     
                     st.divider()
-                    st.subheader("📚 Daftar Mata Kuliah Anda:")
+                    st.subheader("📚 Klik Mata Kuliah untuk Masuk Classroom:")
                     
                     if mk_mhs and mk_mhs != 'nan':
                         list_mk = mk_mhs.split(',')
                         for i, mk in enumerate(list_mk):
-                            # Memberikan warna berbeda untuk tiap kotak
+                            mk_name = mk.strip()
                             bg_color = colors[i % len(colors)]
-                            st.markdown(f'''
-                                <div class="course-card" style="background-color: {bg_color};">
-                                    📖 {mk.strip()}
-                                </div>
-                            ''', unsafe_allow_html=True)
+                            
+                            # Ambil link dari kamus, jika tidak ada kirim ke halaman utama Classroom
+                            link_tujuan = classroom_links.get(mk_name, "https://classroom.google.com")
+                            
+                            # Menampilkan kotak yang bisa diklik dengan warna berbeda
+                            st.markdown(f'<style>div.stLinkButton:nth-of-type({i+1}) > a {{ background-color: {bg_color} !important; }}</style>', unsafe_allow_html=True)
+                            st.link_button(f"📖 {mk_name}", link_tujuan)
                     else:
-                        st.info("Belum ada mata kuliah terdaftar.")
+                        st.info("Mata kuliah belum terdaftar.")
                 else:
                     st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}")
             else:
                 st.error("NIM tidak ditemukan.")
         except:
-            st.error("Gagal memproses data. Cek koneksi.")
-
-elif menu == "Materi (Classroom)":
-    st.title("📚 Materi")
-    st.link_button("🚀 Masuk Classroom", "https://classroom.google.com/")
+            st.error("Gagal memproses data.")
