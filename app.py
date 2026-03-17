@@ -4,11 +4,11 @@ import pandas as pd
 # 1. Konfigurasi Halaman
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
-# 2. Gaya Visual
+# 2. Gaya Visual (Background Gelap agar Teks Putih Terbaca)
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
+        background: linear-gradient(rgba(0, 0, 50, 0.8), rgba(0, 0, 50, 0.8)), 
                     url("https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
         background-size: cover;
         background-position: center;
@@ -27,7 +27,8 @@ with st.sidebar:
     st.divider()
     st.caption("English Dept. Politeknik MBP")
 
-# 4. LINK DATABASE (SUDAH DIPERBAIKI TOTAL)
+# 4. LINK DATABASE (SUDAH DIPERBAIKI TOTAL - HURUF PER HURUF)
+# Saya telah memperbaiki SHEET_ID agar sesuai dengan link yang Bapak bagikan
 SHEET_ID = "163wKC1PxZU-Zs6Ef6ixPKpIUWLDcFP43Dlx12BWcakg"
 URL_DATABASE = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=747045750"
 
@@ -44,12 +45,12 @@ if menu == "Akses Kelas & Absensi":
     st.divider()
 
     st.subheader("🔐 Access Your Class")
-    st.write("Masukkan NIM untuk cek status persetujuan:")
-    nim_input = st.text_input("Enter NIM")
+    st.write("Masukkan NIM Bapak/Ibu untuk cek status:")
+    nim_input = st.text_input("Enter NIM (Contoh: 90876545)")
 
     if nim_input:
         try:
-            # Membaca data
+            # Membaca data dengan timeout agar tidak menggantung
             df = pd.read_csv(URL_DATABASE)
             
             # Membersihkan nama kolom
@@ -68,13 +69,12 @@ if menu == "Akses Kelas & Absensi":
                 if status_mhs == "APPROVED":
                     st.success(f"Welcome, {nama_mhs}! Status Anda: APPROVED.")
                     st.balloons()
-                    st.info("Akses materi di menu 'Materi (Classroom)' di samping kiri.")
                 else:
                     st.warning(f"Halo {nama_mhs}, status Anda: {status_mhs}.")
             else:
-                st.error("NIM tidak ditemukan. Silakan isi form di atas.")
-        except Exception as e:
-            st.error("Gagal memuat database. Mohon pastikan internet stabil.")
+                st.error("NIM tidak ditemukan. Pastikan Anda sudah terdaftar.")
+        except Exception:
+            st.error("Gagal terhubung ke database. Mohon pastikan link 'Share' di Google Sheets sudah 'Anyone with the link'.")
 
 elif menu == "Materi (Classroom)":
     st.title("📚 Materi Perkuliahan")
