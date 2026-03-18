@@ -64,12 +64,12 @@ st.markdown("""
 
 <div class="nav-container">
     <a href="/" class="nav-link">🎓 HOME / SIGN IN</a>
-    <a href="https://docs.google.com/forms/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/viewform" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfBTCp9tKuRoCODRtofnjlf4wd-0BmnHEt9SnQSiiMFH75v2Q/viewform?usp=sharing" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
     <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT</a>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC AMAN) ---
+# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC TETAP AMAN) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -78,6 +78,7 @@ classroom_links = {
     "Translation II": "https://classroom.google.com/c/ODUxODUzOTMwNTA3?cjc=vtihdzh"
 }
 
+# Palet warna untuk 3 Mata Kuliah Berbeda
 color_palette = ["#FF5E5E", "#46EB7E", "#58CCFF", "#F1C40F", "#FF9F43"]
 
 # --- 3. LOGIKA HALAMAN LOGIN ---
@@ -91,7 +92,7 @@ if nim_input:
     try:
         df = pd.read_csv(URL_SHARE)
         target_nim = str(nim_input).strip()
-        # MESIN ILOC ASLI - TETAP DIJAGA SESUAI KESEPAKATAN
+        # SISTEM ILOC - TIDAK DISENTUH
         df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
         student_data = df[df.iloc[:, 2] == target_nim]
         
@@ -101,12 +102,13 @@ if nim_input:
             
             st.success(f"Welcome, {nama_mhs}!")
             st.divider()
-            st.subheader("📚 Mata Kuliah Anda:")
+            st.subheader("📚 Klik Mata Kuliah Anda:")
             
             if mk_mhs and mk_mhs != 'nan':
                 list_mk = mk_mhs.split(',')
                 for i, mk in enumerate(list_mk):
                     mk_name = mk.strip()
+                    # Menghasilkan warna berbeda tiap kotak (3 MK = 3 Warna)
                     current_color = color_palette[i % len(color_palette)]
                     link = classroom_links.get(mk_name, "https://classroom.google.com")
                     
@@ -115,7 +117,5 @@ if nim_input:
                             📖 {mk_name}
                         </a>
                     """, unsafe_allow_html=True)
-        else:
-            st.error("NIM tidak ditemukan. Gunakan menu ENROLL di atas jika belum terdaftar.")
     except:
         st.error("Gagal memproses data.")
