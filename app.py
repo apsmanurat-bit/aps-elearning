@@ -1,37 +1,36 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. KONFIGURASI HALAMAN & CSS (HEADER NAVIGASI AKTIF) ---
+# --- 1. KONFIGURASI HALAMAN & CSS (NAVIGASI AKTIF DI HEADER) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
 <style>
-    /* HEADER GRADIENT DENGAN NAVIGASI AKTIF */
+    /* HEADER GRADIENT (SESUAI GAMBAR) */
     header[data-testid="stHeader"] {
         background: linear-gradient(to right, #1e3c72, #6a11cb, #ff4b2b) !important;
         height: 60px;
     }
     
-    /* NAVIGASI MENU DI POJOK KIRI HEADER */
+    /* NAVIGASI MENU DI HEADER (BISA DIKLIK) */
     .nav-container {
         position: fixed;
         top: 15px;
         left: 20px;
         z-index: 999999;
         display: flex;
-        gap: 25px;
+        gap: 30px;
     }
     .nav-link {
         color: white !important;
         text-decoration: none !important;
         font-weight: 800;
-        font-size: 16px;
+        font-size: 15px;
         letter-spacing: 1px;
         transition: 0.3s;
     }
     .nav-link:hover {
-        color: #FFD700 !important; /* Kuning Emas saat disentuh */
-        text-shadow: 0px 0px 10px rgba(255,255,255,0.5);
+        color: #FFD700 !important; /* Kuning Emas */
     }
 
     .stApp {
@@ -40,7 +39,7 @@ st.markdown("""
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
-    /* GAYA KOTAK MATA KULIAH (BESAR & PROPORSIONAL) */
+    /* GAYA KOTAK MATA KULIAH (BESAR, PROPORSIONAL & BERSENI) */
     .course-card {
         display: flex;
         align-items: center;
@@ -58,18 +57,17 @@ st.markdown("""
         text-align: center;
     }
     
-    /* SEMBUNYIKAN SIDEBAR */
     [data-testid="stSidebar"] { display: none; }
 </style>
 
 <div class="nav-container">
-    <a href="/" class="nav-link">🎓 HOME / SIGN IN</a>
-    <a href="https://forms.gle/BapakPunyaLink" target="_blank" class="nav-link">📝 ENROLL</a>
-    <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT</a>
+    <a href="/" class="nav-link">🎓 HOME</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdU7S6D4Yf_2_yvK2p1Z6k_I-z_K7o6N6A/viewform" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
+    <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT ADMIN</a>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC AMAN) ---
+# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC TETAP AMAN) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -82,7 +80,7 @@ color_palette = ["#FF5E5E", "#46EB7E", "#58CCFF", "#F1C40F", "#FF9F43"]
 
 # --- 3. LOGIKA HALAMAN LOGIN ---
 st.title("🎓 AngietClass E-Learning")
-st.write("Silakan Sign In dengan NIM Anda di bawah ini.")
+st.write("Silakan Sign In dengan NIM Anda.")
 st.divider()
 
 nim_input = st.text_input("🔑 Masukkan NIM Anda")
