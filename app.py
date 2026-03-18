@@ -1,18 +1,18 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. CSS & HEADER NAVIGATION (MENU AKTIF) ---
+# --- 1. KONFIGURASI HALAMAN & CSS (HEADER NAVIGASI AKTIF) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
 <style>
-    /* HEADER GRADIENT (SESUAI GAMBAR) */
+    /* HEADER GRADIENT (BIRU-UNGU-MERAH) SESUAI GAMBAR */
     header[data-testid="stHeader"] {
         background: linear-gradient(to right, #1e3c72, #6a11cb, #ff4b2b) !important;
         height: 60px;
     }
     
-    /* NAVIGASI MENU DI HEADER */
+    /* NAVIGASI MENU DI HEADER (BISA DIKLIK) */
     .nav-container {
         position: fixed;
         top: 15px;
@@ -27,8 +27,11 @@ st.markdown("""
         font-weight: 800;
         font-size: 15px;
         letter-spacing: 1px;
+        transition: 0.3s;
     }
-    .nav-link:hover { color: #FFD700 !important; }
+    .nav-link:hover {
+        color: #FFD700 !important; /* Kuning Emas */
+    }
 
     .stApp {
         background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
@@ -36,7 +39,7 @@ st.markdown("""
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
-    /* KOTAK MATA KULIAH (BESAR & PROPORSIONAL) */
+    /* GAYA KOTAK MATA KULIAH (BESAR, PROPORSIONAL & BERSENI) */
     .course-card {
         display: flex;
         align-items: center;
@@ -52,14 +55,16 @@ st.markdown("""
         box-shadow: 8px 8px 20px rgba(0,0,0,0.5);
         border: 3px solid rgba(255,255,255,0.3);
         text-align: center;
+        transition: 0.3s;
     }
+    .course-card:hover { transform: scale(1.02); filter: brightness(1.1); }
     
     [data-testid="stSidebar"] { display: none; }
 </style>
 
 <div class="nav-container">
-    <a href="/" class="nav-link">🎓 HOME</a>
-    <a href="https://forms.gle/4u6Xw6X7X6X7X6X7" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
+    <a href="/" class="nav-link">🎓 HOME / SIGN IN</a>
+    <a href="https://docs.google.com/forms/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/viewform" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
     <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT</a>
 </div>
 """, unsafe_allow_html=True)
@@ -110,5 +115,7 @@ if nim_input:
                             📖 {mk_name}
                         </a>
                     """, unsafe_allow_html=True)
+        else:
+            st.error("NIM tidak ditemukan. Gunakan menu ENROLL di atas jika belum terdaftar.")
     except:
         st.error("Gagal memproses data.")
