@@ -1,39 +1,62 @@
 import streamlit as st
+import sqlite3
 
-# 1. PENGATURAN HALAMAN (Agar Tampilan Luas & Berseni)
+# --- 1. SETUP DATABASE (Penyimpanan Mahasiswa) ---
+def create_usertable():
+    conn = sqlite3.connect('users_data.db')
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT, password TEXT)')
+    conn.commit()
+    conn.close()
+
+def add_userdata(username, password):
+    conn = sqlite3.connect('users_data.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO userstable(username, password) VALUES (?,?)', (username, password))
+    conn.commit()
+    conn.close()
+
+def login_user(username, password):
+    conn = sqlite3.connect('users_data.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM userstable WHERE username =? AND password = ?', (username, password))
+    data = c.fetchall()
+    conn.close()
+    return data
+
+# --- 2. TAMPILAN HALAMAN ---
 st.set_page_config(page_title="ANGIET CLASS | APS E-LEARNING", layout="wide")
+create_usertable()
 
-# 2. MENAMPILKAN HEADER EKSKLUSIF (Hasil Desain Terakhir Kita)
-# Gambar ini sudah mengandung Gradient, Nama ANGIETCLASS, dan Logo MBP Besar
-header_url = "http://googleusercontent.com/image_generation_content/12"
-st.image(header_url, use_container_width=True)
+# Header Desain Kita (Gambar Logo)
+header_url = "https://raw.githubusercontent.com/apsmanurat-bit/aps-elearning/main/logo.png" # Ganti dengan link logo Bapak jika ada
+st.image("https://via.placeholder.com/1200x300.png?text=ANGIET+CLASS+-+APS+E-LEARNING", use_container_width=True)
 
-st.write("---") # Garis pemisah tipis agar rapi
+# --- 3. MENU SIDEBAR (Pilihan Login/Daftar) ---
+menu = ["Login", "Daftar Akun Baru"]
+choice = st.sidebar.selectbox("Pilih Menu", menu)
 
-# 3. KOTAK LOGIN DENGAN FITUR "ENTER" (MENGGUNAKAN st.form)
-# Baris ini membungkus input agar tombol Enter di keyboard otomatis memicu Sign In
-with st.container():
-    col1, col2, col3 = st.columns([1, 2, 1]) # Agar kotak login berada di tengah
-    
-    with col2:
-        with st.form("login_form"):
-            st.markdown("<h3 style='text-align: center;'>SIGN IN - APS E-LEARNING</h3>", unsafe_allow_html=True)
-            
-            username = st.text_input("Username", placeholder="Masukkan Username Anda")
-            password = st.text_input("Password", type="password", placeholder="Masukkan Password Anda")
-            
-            # Tombol Submit (Akan terpicu otomatis saat menekan Enter)
-            submit_button = st.form_submit_button("SIGN IN", use_container_width=True)
-
-        # 4. LOGIKA SETELAH TOMBOL DIKLIK ATAU TEKAN ENTER
+if choice == "Login":
+    st.subheader("Silakan Login")
+    with st.form("login_form"):
+        username = st.text_input("Username (NIM)")
+        password = st.text_input("Password", type='password')
+        submit_button = st.form_submit_button("SIGN IN")
+        
         if submit_button:
-            # Contoh Validasi Sederhana
-            if username == "admin" and password == "123":
-                st.success(f"Selamat Datang di ANGIETCLASS, {username}!")
-                st.balloons() # Efek perayaan kecil agar mahasiswa senang
-                # Di sini Bapak bisa arahkan ke materi Google Classroom atau halaman lain
+            result = login_user(username, password)
+            if result:
+                st.success(f"Selamat Datang, {username}!")
+                st.balloons()
+                # Di sini nanti kita pasang link ke materi Bapak
             else:
-                st.error("Maaf, Username atau Password salah. Silakan coba lagi.")
+                st.error("Username atau Password salah. Silakan daftar dulu jika belum punya akun.")
 
-# 5. FOOTER (Identitas Tambahan)
-st.markdown("<br><p style='text-align: center; color: gray;'>© 2026 ANGIET CLASS - Politeknik MBP Medan</p>", unsafe_allow_html=True)
+elif choice == "Daftar Akun Baru":
+    st.subheader("Buat Akun Mahasiswa")
+    new_user = st.text_input("Username Baru (Saran: Pakai NIM)")
+    new_password = st.text_input("Password Baru", type='password')
+    
+    if st.button("Daftar Sekarang"):
+        add_userdata(new_user, new_password)
+        st.success("Akun berhasil dibuat! Silakan pindah ke menu Login di sebelah kiri.")
