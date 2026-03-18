@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. KONFIGURASI HALAMAN & CSS (NAVIGASI AKTIF DI HEADER) ---
+# --- 1. CSS & HEADER NAVIGATION (MENU AKTIF) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -12,7 +12,7 @@ st.markdown("""
         height: 60px;
     }
     
-    /* NAVIGASI MENU DI HEADER (BISA DIKLIK) */
+    /* NAVIGASI MENU DI HEADER */
     .nav-container {
         position: fixed;
         top: 15px;
@@ -27,11 +27,8 @@ st.markdown("""
         font-weight: 800;
         font-size: 15px;
         letter-spacing: 1px;
-        transition: 0.3s;
     }
-    .nav-link:hover {
-        color: #FFD700 !important; /* Kuning Emas */
-    }
+    .nav-link:hover { color: #FFD700 !important; }
 
     .stApp {
         background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
@@ -39,7 +36,7 @@ st.markdown("""
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
-    /* GAYA KOTAK MATA KULIAH (BESAR, PROPORSIONAL & BERSENI) */
+    /* KOTAK MATA KULIAH (BESAR & PROPORSIONAL) */
     .course-card {
         display: flex;
         align-items: center;
@@ -62,12 +59,12 @@ st.markdown("""
 
 <div class="nav-container">
     <a href="/" class="nav-link">🎓 HOME</a>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdU7S6D4Yf_2_yvK2p1Z6k_I-z_K7o6N6A/viewform" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
-    <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT ADMIN</a>
+    <a href="https://docs.google.com/forms/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/viewform" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
+    <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT</a>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC TETAP AMAN) ---
+# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC AMAN) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -89,7 +86,7 @@ if nim_input:
     try:
         df = pd.read_csv(URL_SHARE)
         target_nim = str(nim_input).strip()
-        # MESIN ILOC ASLI - TETAP DIJAGA SESUAI KESEPAKATAN
+        # MESIN ILOC ASLI - TETAP DIJAGA
         df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
         student_data = df[df.iloc[:, 2] == target_nim]
         
