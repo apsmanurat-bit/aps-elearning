@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. KONFIGURASI HALAMAN & CSS (HEADER & MENU ATAS) ---
+# --- 1. KONFIGURASI HALAMAN & CSS (HEADER DENGAN TOMBOL MENU) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
@@ -9,16 +9,29 @@ st.markdown("""
     /* HEADER GRADIENT SESUAI GAMBAR */
     header[data-testid="stHeader"] {
         background: linear-gradient(to right, #1e3c72, #6a11cb, #ff4b2b) !important;
+        height: 60px;
     }
-    header[data-testid="stHeader"] * { color: white !important; }
 
+    /* MENYUNTIKKAN TEKS MENU DI HEADER (SEJAJAR SHARE/DEPLOY) */
+    header[data-testid="stHeader"]::before {
+        content: '🎓 ANGIET CLASS  |  📝 ENROLL  |  🔑 SIGN IN';
+        position: absolute;
+        left: 20px;
+        top: 15px;
+        color: white;
+        font-weight: 800;
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    /* BACKGROUND APLIKASI */
     .stApp {
         background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
                     url("https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
-    /* GAYA KOTAK BERSENI & PROPORSIONAL */
+    /* GAYA KOTAK MATA KULIAH (BESAR & BERSENI) */
     .course-card {
         display: flex;
         align-items: center;
@@ -38,12 +51,12 @@ st.markdown("""
     }
     .course-card:hover { transform: scale(1.02); filter: brightness(1.1); }
     
-    /* MENGHILANGKAN SIDEBAR AGAR BERSIH */
+    /* SEMBUNYIKAN SIDEBAR */
     [data-testid="stSidebar"] { display: none; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEM DATABASE (TIDAK BERUBAH - KUNCI MATI) ---
+# --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC AMAN) ---
 URL_SHARE = "https://docs.google.com/spreadsheets/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/export?format=csv&gid=747045750"
 
 classroom_links = {
@@ -54,52 +67,46 @@ classroom_links = {
 
 color_palette = ["#FF5E5E", "#46EB7E", "#58CCFF", "#F1C40F", "#FF9F43"]
 
-# --- 3. MENU UTAMA DI BAGIAN ATAS (TOP MENU) ---
-st.title("👨‍🏫 Menu Utama")
-menu = st.selectbox("Silakan Pilih Layanan:", ["Akses Kelas & Absensi", "Enroll / Sign Up Baru"])
+# --- 3. LOGIKA HALAMAN ---
+st.title("🎓 AngietClass E-Learning")
+st.write("Silakan masukkan NIM untuk mengakses mata kuliah Anda.")
 st.divider()
 
-# --- 4. LOGIKA HALAMAN ---
-if menu == "Akses Kelas & Absensi":
-    st.subheader("🎓 AngietClass E-Learning")
-    nim_input = st.text_input("Masukkan NIM Anda")
+nim_input = st.text_input("🔑 Masukkan NIM Anda untuk Sign In")
 
-    if nim_input:
-        try:
-            df = pd.read_csv(URL_SHARE)
-            target_nim = str(nim_input).strip()
-            # SISTEM ILOC YANG SUDAH BERHASIL (TIDAK DISENTUH)
-            df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
-            student_data = df[df.iloc[:, 2] == target_nim]
+if nim_input:
+    try:
+        df = pd.read_csv(URL_SHARE)
+        target_nim = str(nim_input).strip()
+        # MESIN ILOC ASLI - TETAP DIJAGA
+        df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
+        student_data = df[df.iloc[:, 2] == target_nim]
+        
+        if not student_data.empty:
+            nama_mhs = student_data.iloc[0, 1]
+            mk_mhs = str(student_data.iloc[0, 5]).strip()
             
-            if not student_data.empty:
-                nama_mhs = student_data.iloc[0, 1]
-                mk_mhs = str(student_data.iloc[0, 5]).strip()
-                
-                st.success(f"Welcome, {nama_mhs}!")
-                st.divider()
-                st.subheader("📚 Klik Mata Kuliah Anda:")
-                
-                if mk_mhs and mk_mhs != 'nan':
-                    list_mk = mk_mhs.split(',')
-                    for i, mk in enumerate(list_mk):
-                        mk_name = mk.strip()
-                        current_color = color_palette[i % len(color_palette)]
-                        link = classroom_links.get(mk_name, "https://classroom.google.com")
-                        
-                        st.markdown(f"""
-                            <a href="{link}" target="_blank" class="course-card" style="background-color: {current_color};">
-                                📖 {mk_name}
-                            </a>
-                        """, unsafe_allow_html=True)
-        except:
-            st.error("Gagal memproses data.")
+            st.success(f"Welcome, {nama_mhs}!")
+            st.divider()
+            st.subheader("📚 Klik Mata Kuliah Anda:")
+            
+            if mk_mhs and mk_mhs != 'nan':
+                list_mk = mk_mhs.split(',')
+                for i, mk in enumerate(list_mk):
+                    mk_name = mk.strip()
+                    current_color = color_palette[i % len(color_palette)]
+                    link = classroom_links.get(mk_name, "https://classroom.google.com")
+                    
+                    st.markdown(f"""
+                        <a href="{link}" target="_blank" class="course-card" style="background-color: {current_color};">
+                            📖 {mk_name}
+                        </a>
+                    """, unsafe_allow_html=True)
+        else:
+            st.error("NIM tidak ditemukan. Silakan gunakan menu ENROLL di atas jika belum terdaftar.")
+    except:
+        st.error("Gagal memproses data.")
 
-elif menu == "Enroll / Sign Up Baru":
-    st.subheader("📝 Pendaftaran Kelas Baru")
-    st.markdown(f"""
-        <a href="https://forms.gle/BapakPunyaLink" target="_blank" class="course-card" style="background-color: #FF9F43;">
-            🚀 Klik untuk Enroll Sekarang
-        </a>
-    """, unsafe_allow_html=True)
-    st.caption("English Dept. Politeknik MBP")
+# --- FOOTER (Opsional untuk mempertegas link Enroll) ---
+st.divider()
+st.caption("Butuh bantuan? Silakan hubungi Admin English Dept.")
