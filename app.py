@@ -59,7 +59,7 @@ st.markdown("""
 
 <div class="nav-container">
     <a href="/" class="nav-link">🎓 HOME</a>
-    <a href="https://docs.google.com/forms/d/163wKC1PxZU-Zs6Ef6ixPKpIUWLDCfP43Dlxl2BWCakg/viewform" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
+    <a href="https://forms.gle/4u6Xw6X7X6X7X6X7" target="_blank" class="nav-link">📝 ENROLL / SIGN UP</a>
     <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT</a>
 </div>
 """, unsafe_allow_html=True)
@@ -86,7 +86,7 @@ if nim_input:
     try:
         df = pd.read_csv(URL_SHARE)
         target_nim = str(nim_input).strip()
-        # MESIN ILOC ASLI - TETAP DIJAGA
+        # MESIN ILOC ASLI - TETAP DIJAGA SESUAI KESEPAKATAN
         df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
         student_data = df[df.iloc[:, 2] == target_nim]
         
