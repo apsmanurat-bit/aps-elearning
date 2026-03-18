@@ -1,37 +1,46 @@
 import streamlit as st
 import pandas as pd
 
-# --- 1. KONFIGURASI HALAMAN & CSS (HEADER DENGAN TOMBOL MENU) ---
+# --- 1. KONFIGURASI HALAMAN & CSS (HEADER NAVIGASI AKTIF) ---
 st.set_page_config(page_title="AngietClass E-Learning", layout="wide")
 
 st.markdown("""
 <style>
-    /* HEADER GRADIENT SESUAI GAMBAR */
+    /* HEADER GRADIENT DENGAN NAVIGASI AKTIF */
     header[data-testid="stHeader"] {
         background: linear-gradient(to right, #1e3c72, #6a11cb, #ff4b2b) !important;
         height: 60px;
     }
-
-    /* MENYUNTIKKAN TEKS MENU DI HEADER (SEJAJAR SHARE/DEPLOY) */
-    header[data-testid="stHeader"]::before {
-        content: '🎓 ANGIET CLASS  |  📝 ENROLL  |  🔑 SIGN IN';
-        position: absolute;
-        left: 20px;
+    
+    /* NAVIGASI MENU DI POJOK KIRI HEADER */
+    .nav-container {
+        position: fixed;
         top: 15px;
-        color: white;
+        left: 20px;
+        z-index: 999999;
+        display: flex;
+        gap: 25px;
+    }
+    .nav-link {
+        color: white !important;
+        text-decoration: none !important;
         font-weight: 800;
         font-size: 16px;
         letter-spacing: 1px;
+        transition: 0.3s;
+    }
+    .nav-link:hover {
+        color: #FFD700 !important; /* Kuning Emas saat disentuh */
+        text-shadow: 0px 0px 10px rgba(255,255,255,0.5);
     }
 
-    /* BACKGROUND APLIKASI */
     .stApp {
         background: linear-gradient(rgba(0, 0, 50, 0.75), rgba(0, 0, 50, 0.75)), 
                     url("https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
         background-size: cover; background-position: center; background-attachment: fixed;
     }
 
-    /* GAYA KOTAK MATA KULIAH (BESAR & BERSENI) */
+    /* GAYA KOTAK MATA KULIAH (BESAR & PROPORSIONAL) */
     .course-card {
         display: flex;
         align-items: center;
@@ -46,14 +55,18 @@ st.markdown("""
         font-weight: 900;
         box-shadow: 8px 8px 20px rgba(0,0,0,0.5);
         border: 3px solid rgba(255,255,255,0.3);
-        transition: 0.3s;
         text-align: center;
     }
-    .course-card:hover { transform: scale(1.02); filter: brightness(1.1); }
     
     /* SEMBUNYIKAN SIDEBAR */
     [data-testid="stSidebar"] { display: none; }
 </style>
+
+<div class="nav-container">
+    <a href="/" class="nav-link">🎓 HOME / SIGN IN</a>
+    <a href="https://forms.gle/BapakPunyaLink" target="_blank" class="nav-link">📝 ENROLL</a>
+    <a href="mailto:admin@politeknikmbp.ac.id" class="nav-link">📧 CONTACT</a>
+</div>
 """, unsafe_allow_html=True)
 
 # --- 2. SISTEM DATABASE (TIDAK BERUBAH - ILOC AMAN) ---
@@ -67,18 +80,18 @@ classroom_links = {
 
 color_palette = ["#FF5E5E", "#46EB7E", "#58CCFF", "#F1C40F", "#FF9F43"]
 
-# --- 3. LOGIKA HALAMAN ---
+# --- 3. LOGIKA HALAMAN LOGIN ---
 st.title("🎓 AngietClass E-Learning")
-st.write("Silakan masukkan NIM untuk mengakses mata kuliah Anda.")
+st.write("Silakan Sign In dengan NIM Anda di bawah ini.")
 st.divider()
 
-nim_input = st.text_input("🔑 Masukkan NIM Anda untuk Sign In")
+nim_input = st.text_input("🔑 Masukkan NIM Anda")
 
 if nim_input:
     try:
         df = pd.read_csv(URL_SHARE)
         target_nim = str(nim_input).strip()
-        # MESIN ILOC ASLI - TETAP DIJAGA
+        # MESIN ILOC ASLI - TETAP DIJAGA SESUAI KESEPAKATAN
         df.iloc[:, 2] = df.iloc[:, 2].astype(str).str.strip()
         student_data = df[df.iloc[:, 2] == target_nim]
         
@@ -88,7 +101,7 @@ if nim_input:
             
             st.success(f"Welcome, {nama_mhs}!")
             st.divider()
-            st.subheader("📚 Klik Mata Kuliah Anda:")
+            st.subheader("📚 Mata Kuliah Anda:")
             
             if mk_mhs and mk_mhs != 'nan':
                 list_mk = mk_mhs.split(',')
@@ -102,11 +115,5 @@ if nim_input:
                             📖 {mk_name}
                         </a>
                     """, unsafe_allow_html=True)
-        else:
-            st.error("NIM tidak ditemukan. Silakan gunakan menu ENROLL di atas jika belum terdaftar.")
     except:
         st.error("Gagal memproses data.")
-
-# --- FOOTER (Opsional untuk mempertegas link Enroll) ---
-st.divider()
-st.caption("Butuh bantuan? Silakan hubungi Admin English Dept.")
